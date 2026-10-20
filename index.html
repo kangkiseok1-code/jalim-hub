@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f6f3">
+<title>자림</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="jalim-base.css">
+<style>
+#app{max-width:640px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 18px max(60px,env(safe-area-inset-bottom))}
+.title{font-family:var(--serif);font-size:2.4rem;font-weight:700;letter-spacing:.14em;margin:8px 0 0;color:var(--ink)}
+.title-sub{font-size:1rem;color:var(--sub);margin:2px 0 20px;font-weight:600;letter-spacing:.02em}
+.grid{display:flex;flex-direction:column;gap:12px}
+.card{position:relative;display:flex;align-items:center;gap:14px;min-height:72px;margin:0;padding:14px 56px 14px 18px;color:var(--ink);text-decoration:none;touch-action:manipulation}
+.card:active{transform:scale(.97);transition:transform .1s ease-out}
+@media(hover:hover){.card:hover{background:#f1ece1}}
+.card .ic{width:24px;height:24px;color:var(--gold)}
+.txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.name{font-size:1.05rem;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.hint{margin:0;font-size:.85rem;color:var(--sub)}
+.hint[hidden]{display:none}
+.info{position:absolute;top:50%;right:6px;margin-top:-22px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:none;border:0;padding:0;color:var(--muted);cursor:pointer;border-radius:22px;touch-action:manipulation}
+.info[aria-expanded="true"]{color:var(--gold)}
+:focus-visible{outline:none;box-shadow:0 0 0 3px var(--gold-soft);border-color:var(--ink)}
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="title">자림</h1>
+  <p class="title-sub">나를 알아가는 시간</p>
+  <div class="grid" id="grid"></div>
+  <div class="foot">ⓘ를 누르면 설명이 펼쳐져요</div>
+</div>
+
+<script>
+/* 선 아이콘 — 만남 앱 MI 세트와 같은 규격 */
+var BASE='https://kangkiseok1-code.github.io/';
+var APPS=[
+  {name:'분석',   href:BASE+'mating-app/',                 hint:'사주·성향·대인관계·기호로 나를 알아가요',
+   icon:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'},
+  {name:'만남',   href:BASE+'mating-app/',                 hint:'나에게 맞는 인연을 찾아가요',
+   icon:'<path d="M12 20s-7-4.5-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.5-7 10-7 10z"/>'},
+  {name:'심화상담', href:BASE+'counsel-tool/',              hint:'나에 대한 설명이 필요할 때, 고민이 있을 때',
+   icon:'<path d="M4 5h16v11H9l-5 4z"/>'},
+  {name:'재물운 달력', href:BASE+'lotto-app/',               hint:'날짜별 재물운과 번호 추천',
+   icon:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/>'},
+  {name:'팀메이커', href:BASE+'Team-maker/team-maker.html', hint:'사주와 성향으로 팀을 이해하고 구성해요',
+   icon:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 010 7M18 14.5c1.8.7 3 2.6 3.5 5.5"/>'}
+];
+var INFO='<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>';
+var grid=document.getElementById('grid');
+APPS.forEach(function(a,i){
+  var el=document.createElement('a');
+  el.className='card'; el.href=a.href;
+  el.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+a.icon+'</svg>'
+    +'<div class="txt"><span class="name">'+a.name+'</span><p class="hint" id="h'+i+'" hidden>'+a.hint+'</p></div>'
+    +'<button type="button" class="info" aria-label="'+a.name+' 설명 보기" aria-expanded="false" aria-controls="h'+i+'"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+INFO+'</svg></button>';
+  var btn=el.querySelector('.info'), hint=el.querySelector('.hint');
+  btn.addEventListener('click',function(e){
+    e.preventDefault(); e.stopPropagation();
+    var open=hint.hidden; hint.hidden=!open; btn.setAttribute('aria-expanded',open);
+  });
+  grid.appendChild(el);
+});
+</script>
+</body>
+</html>
