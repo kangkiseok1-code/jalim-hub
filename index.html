@@ -39,6 +39,12 @@
 .or{display:flex;align-items:center;gap:10px;margin:14px 0 2px;color:var(--muted);font-size:.8rem}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 .switch{color:var(--gold);cursor:pointer;font-weight:600}
+/* 로그인 성공 표시 */
+.jn-sheet:has(.done){display:flex;flex-direction:column}
+.done{display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0;margin:auto}
+.done svg{width:64px;height:64px;fill:none;stroke:var(--ok);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.done circle{stroke:var(--ok-soft);fill:var(--ok-soft);transform-origin:center}
+.done b{font-size:1.05rem}
 </style>
 </head>
 <body>

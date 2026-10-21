@@ -16,6 +16,8 @@ function safeNext(raw){
   }catch(e){}
   return null;
 }
+/* 카카오 등 외부 로그인에서 방금 돌아왔는지(주소에 인증 정보가 붙어 있음) — supabase가 주소를 지우기 전에 기록 */
+var FRESH_LOGIN=/[?&]code=|access_token=/.test(location.search+location.hash);
 var NEXT=safeNext(new URLSearchParams(location.search).get('next'));
 
 function $(id){return document.getElementById(id)}
@@ -64,9 +66,19 @@ function loginSheet(){
   $('sw').onclick=function(){authMode=su?'login':'signup';loginSheet()};
   $(su?'pw2':'pw').onkeydown=function(e){if(e.key==='Enter')$('go').click()};
 }
+/* 로그인 성공 표시: 체크가 그려진 뒤 0.7초 있다가 이동·닫기. 움직임 줄이기면 바로 진행 */
+function showDone(msg,after){
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){after();return}
+  if(!sheetEl){openSheet('')}
+  sheetEl.style.minHeight='220px';
+  sheetEl.innerHTML='<div class="done" role="status"><svg viewBox="0 0 52 52" aria-hidden="true"><circle class="jm-pop" cx="26" cy="26" r="23"/><path class="jm-draw" pathLength="1" d="M15 27l8 8 14-16"/></svg><b>'+esc(msg)+'</b></div>';
+  setTimeout(after,700);
+}
 function afterAuth(){
-  if(NEXT){location.replace(NEXT);return}
-  closeSheet();
+  showDone('로그인됐어요',function(){
+    if(NEXT){location.replace(NEXT);return}
+    closeSheet();
+  });
 }
 async function doKakao(){
   if(!sb){status('연결할 수 없어요. 잠시 뒤 다시 시도해주세요','err');return}
@@ -156,6 +168,7 @@ function renderAccountChip(){
   var r=await sb.auth.getSession();
   me=(r.data&&r.data.session)?r.data.session.user:null;
   renderAccountChip();
+  if(me&&FRESH_LOGIN){showDone('로그인됐어요',function(){if(NEXT)location.replace(NEXT);else closeSheet()});return}   // 카카오 등에서 방금 돌아옴
   if(me&&NEXT){location.replace(NEXT);return}
   if(!me&&NEXT){authMode='login';loginSheet()}
   sb.auth.onAuthStateChange(function(ev,s){
