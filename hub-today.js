@@ -38,18 +38,34 @@ function todayFortune(E,p){
   var d=TODAY_BY_GROUP[TODAY_GROUP[sib]||'비겁'];
   return {elem:elem,title:d.t,line:d.line,date:(now.getMonth()+1)+'월 '+now.getDate()+'일 · '+'일월화수목금토'.charAt(now.getDay())+'요일'};
 }
+var MATING_URL=ORIGIN+'/mating-app/';
 function todayCardHtml(f,nick){
   var e=TODAY_ELEM[f.elem];
-  return '<div class="today-mark" style="background:'+e.c+'" aria-hidden="true">'+e.h+'</div>'
+  return '<a class="today-in jm-press" href="'+MATING_URL+'?go=saju" aria-label="내 사주 분석 보기">'
+    +'<div class="today-mark" style="background:'+e.c+'" aria-hidden="true">'+e.h+'</div>'
     +'<div class="today-txt"><span class="today-date">'+esc(f.date)+'</span>'
     +'<b>'+(nick?esc(nick)+'님, ':'')+'오늘은 '+e.h+'의 날이에요</b>'
     +'<span class="today-line">'+esc(f.title)+' · '+esc(f.line)+'</span>'
-    +'<span class="today-lucky">행운색 '+e.k+'</span></div>';
+    +'<span class="today-lucky">행운색 '+e.k+'</span></div></a>';
+}
+/* 나의 분석 바로가기 — 검사했는지는 허브가 모른다. 눌러서 만남의 그 탭으로 가면 거기서 결과 또는 '검사하기'가 나온다 */
+var MY_TILES=[
+  ['trait','성향','<path d="M12 3l8 6-3 10H7L4 9z"/>'],
+  ['pref','기호','<path d="M5 7h14M5 12h14M5 17h9"/>'],
+  ['ipc','대인관계','<circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/>']];
+function renderMyTiles(){
+  var box=document.getElementById('mytiles'); if(!box) return;
+  if(!me){ box.hidden=true; box.innerHTML=''; return; }
+  box.hidden=false;
+  box.innerHTML='<div class="sec-label">나의 분석</div><div class="mytile-row">'+MY_TILES.map(function(x){
+    return '<a class="mytile jm-press" href="'+MATING_URL+'?go='+x[0]+'"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+x[2]+'</svg>'+x[1]+'</a>';
+  }).join('')+'</div>';
 }
 /* 로그인한 사람의 프로필을 읽어 카드를 그린다. 로그인 전·생년월일 없음·불러오기 실패는 카드 없이(지금 모습 그대로) */
 async function refreshToday(){
   var box=document.getElementById('today'); if(!box) return;
   var run=++todayRun;
+  renderMyTiles();
   box.hidden=true; box.innerHTML='';
   if(!sb||!me) return;
   try{

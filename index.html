@@ -46,9 +46,18 @@
 .done circle{stroke:var(--ok-soft);fill:var(--ok-soft);transform-origin:center}
 .done b{font-size:1.05rem}
 /* 오늘의 기운 카드 */
-.today{display:flex;align-items:center;gap:14px;margin:0 0 14px;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-list)}
+.today{margin:0 0 14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-list)}
+.today-in{display:flex;align-items:center;gap:14px;padding:16px 18px;color:inherit;text-decoration:none;border-radius:var(--r-list);touch-action:manipulation}
+@media(hover:hover){.today-in:hover{background:var(--surface-2)}}
 .today[hidden]{display:none}
 .today.jn-skel{min-height:96px;border-color:transparent}
+/* 나의 분석 바로가기 */
+.mytiles{margin:0 0 14px}.mytiles[hidden]{display:none}
+.sec-label{font-size:.8rem;font-weight:600;color:var(--sub);margin:0 2px 8px}
+.mytile-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mytile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:72px;padding:12px 6px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-list);color:var(--ink);text-decoration:none;font-size:.88rem;font-weight:600;touch-action:manipulation}
+.mytile .ic{width:24px;height:24px;color:var(--gold);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(hover:hover){.mytile:hover{background:var(--surface-2)}}
 .today-mark{flex:none;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--serif);font-size:1.7rem;font-weight:700}
 .today-txt{display:flex;flex-direction:column;gap:3px;min-width:0}
 .today-date{font-size:.78rem;color:var(--sub)}
@@ -78,6 +87,7 @@
     <button id="acct" class="btn sm" type="button">로그인</button>
   </div>
   <div class="today" id="today" hidden></div>
+  <div class="mytiles" id="mytiles" hidden></div>
   <div class="grid jm-stagger" id="grid"></div>
   <div class="foot">ⓘ를 누르면 설명이 펼쳐져요</div>
 </div>
