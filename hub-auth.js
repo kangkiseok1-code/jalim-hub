@@ -19,6 +19,8 @@ function safeNext(raw){
 /* 카카오 등 외부 로그인에서 방금 돌아왔는지(주소에 인증 정보가 붙어 있음) — supabase가 주소를 지우기 전에 기록 */
 var FRESH_LOGIN=/[?&]code=|access_token=/.test(location.search+location.hash);
 var NEXT=safeNext(new URLSearchParams(location.search).get('next'));
+/* ?manage=counsel : 관리자가 심화상담 신청 관리 화면을 바로 열고 싶을 때(심화상담 홈의 "승인 대기" 줄에서 옴) */
+var MANAGE=new URLSearchParams(location.search).get('manage')==='counsel';
 
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -74,10 +76,11 @@ function showDone(msg,after){
   sheetEl.innerHTML='<div class="done" role="status"><svg viewBox="0 0 52 52" aria-hidden="true"><circle class="jm-pop" cx="26" cy="26" r="23"/><path class="jm-draw" pathLength="1" d="M15 27l8 8 14-16"/></svg><b>'+esc(msg)+'</b></div>';
   setTimeout(after,700);
 }
+function closeDoneSheet(){ if(sheetEl&&sheetEl.querySelector('.done')) closeSheet(); }   // 로그인 성공 표시만 닫는다
 function afterAuth(){
   showDone('로그인됐어요',function(){
     if(NEXT){location.replace(NEXT);return}
-    closeSheet();
+    closeDoneSheet();
   });
 }
 async function doKakao(){
@@ -187,6 +190,13 @@ async function refreshAccess(){
   }catch(e){}
   if(access.uid!==uid) return;   // 그사이 다른 계정으로 바뀜
   access.loaded=true; renderGate();
+  openManageIfRequested();
+}
+function openManageIfRequested(){
+  if(!MANAGE||!me) return;
+  MANAGE=false;
+  try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){}   // 새로고침해도 다시 열리지 않게 주소에서 지운다
+  if(access.admin) adminSheet(); else toast('관리자만 열 수 있어요');
 }
 function pendingCount(){ return access.list.filter(function(x){return x.status==='pending'}).length }
 /* 카드의 상태 표시 */
@@ -204,6 +214,7 @@ function renderGate(){
 /* 카드 누르기: 승인된 사람만 앱으로, 나머지는 안내 시트 */
 function onGateClick(e){
   var card=e.target.closest&&e.target.closest('.card[data-gate]'); if(!card||e.target.closest('.info')) return;
+  if(access.admin&&access.loaded&&pendingCount()&&e.target.closest('#gate-counsel')){ e.preventDefault(); adminSheet(); return; }
   if(!me){ e.preventDefault(); authMode='login'; loginSheet(); return; }
   if(!access.loaded){ e.preventDefault(); toast('확인 중이에요. 잠시 뒤 다시 눌러주세요'); return; }
   if(counselState()==='approved') return;   // 그대로 이동
@@ -265,9 +276,9 @@ document.addEventListener('click',onGateClick,true);   // 카드 링크보다 �
   var r=await sb.auth.getSession();
   me=(r.data&&r.data.session)?r.data.session.user:null;
   renderAccountChip();
-  if(me&&FRESH_LOGIN){showDone('로그인됐어요',function(){if(NEXT)location.replace(NEXT);else closeSheet()});return}   // 카카오 등에서 방금 돌아옴
+  if(me&&FRESH_LOGIN){showDone('로그인됐어요',function(){if(NEXT)location.replace(NEXT);else closeDoneSheet()});return}   // 카카오 등에서 방금 돌아옴
   if(me&&NEXT){location.replace(NEXT);return}
-  if(!me&&NEXT){authMode='login';loginSheet()}
+  if(!me&&(NEXT||MANAGE)){authMode='login';loginSheet()}
   sb.auth.onAuthStateChange(function(ev,s){
     var u=s?s.user:null;
     if((u&&u.id)!==(me&&me.id)){me=u;renderAccountChip()}
