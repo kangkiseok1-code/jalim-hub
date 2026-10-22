@@ -119,18 +119,25 @@ function displayName(u){
   var m=u.user_metadata||{};
   return m.name||m.full_name||m.nick_name||m.preferred_username||(u.email?u.email.split('@')[0]:'회원');
 }
+function accessChipHtml(){
+  if(!access.loaded||access.admin) return access.admin?' <span class="jn-chip">관리자</span>':'';
+  var s=access.counsel;
+  return ' <span class="jn-chip '+(s==='approved'?'ok':s==='pending'?'warn':s==='rejected'?'bad':'')+'">심화상담 '+(s==='approved'?'이용 가능':s==='pending'?'승인 대기':s==='rejected'?'승인 안 됨':'신청 전')+'</span>';
+}
 function accountSheet(){
   var u=me;
   openSheet(
     '<h2 style="margin-bottom:2px">내 계정</h2>'
    +'<p class="sub" style="margin:0">'+esc(displayName(u))+(u.email?' · '+esc(u.email):'')+'</p>'
-   +'<div style="margin:10px 0 0"><span class="jn-chip ok">'+esc(providerLabel(u)||'로그인됨')+' 로그인 중</span></div>'
+   +'<div style="margin:10px 0 0"><span class="jn-chip ok">'+esc(providerLabel(u)||'로그인됨')+' 로그인 중</span>'+accessChipHtml()+'</div>'
    +'<div class="jn-list">'
+   +(access.admin?'<button class="jn-row" id="adm" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="jn-main">심화상담 신청 관리<span class="jn-s">승인·거절</span></span>'+(pendingCount()?'<span class="jn-badge">'+pendingCount()+'</span>':'')+'</button>':'')
    +'<button class="jn-row" id="lo" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg><span class="jn-main">로그아웃</span></button>'
    +'<button class="jn-row quiet" id="lv" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13"/></svg><span class="jn-main">회원 탈퇴<span class="jn-s">모든 앱의 계정과 기록이 영구 삭제돼요</span></span></button>'
    +'</div>');
   $('lo').onclick=doLogout;
   $('lv').onclick=confirmLeave;
+  if($('adm')) $('adm').onclick=adminSheet;
 }
 async function doLogout(){
   await sb.auth.signOut();me=null;closeSheet();renderAccountChip();toast('로그아웃했어요');
@@ -153,6 +160,7 @@ function confirmLeave(){
 /* 상단 계정 버튼 */
 function renderAccountChip(){
   var b=$('acct');
+  if((me?me.id:null)!==access.uid) refreshAccess();
   if(me){
     b.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
     b.setAttribute('aria-label','내 계정');b.className='jn-iconbtn';b.onclick=accountSheet;
@@ -161,7 +169,95 @@ function renderAccountChip(){
   }
 }
 
+/* 앱 입장 승인 — 심화상담(counsel)만 승인제: 가입 → 정보공유 동의 신청 → 관리자 승인 → 입장 */
+var CONSENT_VER='counsel-v1-2026-10-22';
+var access={uid:null,loaded:false,admin:false,counsel:null,row:null,list:[]};   // counsel: null|'pending'|'approved'|'rejected'
+function counselState(){ return access.admin?'approved':access.counsel; }
+async function refreshAccess(){
+  var uid=me?me.id:null;
+  access={uid:uid,loaded:false,admin:false,counsel:null,row:null,list:[]};
+  renderGate();
+  if(!sb||!me) return;
+  try{
+    var a=await sb.rpc('is_jalim_admin'); access.admin=a.data===true;
+    var q=await sb.from('app_access').select('status,requested_at,decided_at').eq('app','counsel').eq('user_id',me.id).maybeSingle();
+    access.row=q.data||null; access.counsel=q.data?q.data.status:null;
+    if(access.admin){ var l=await sb.rpc('list_app_access',{p_app:'counsel'}); access.list=l.data||[]; }
+  }catch(e){}
+  if(access.uid!==uid) return;   // 그사이 다른 계정으로 바뀜
+  access.loaded=true; renderGate();
+}
+function pendingCount(){ return access.list.filter(function(x){return x.status==='pending'}).length }
+/* 카드의 상태 표시 */
+function renderGate(){
+  var chip=document.getElementById('gate-counsel'); if(!chip) return;
+  var t='',k='warn';
+  if(me&&access.loaded){
+    if(access.admin){ var n=pendingCount(); if(n) t='신청 '+n+'건' }
+    else if(access.counsel==='pending') t='승인 대기';
+    else if(access.counsel==='rejected'){t='승인 안 됨';k='bad'}
+    else if(access.counsel!=='approved') t='신청 필요';
+  }
+  chip.textContent=t; chip.className='jn-chip '+k; chip.hidden=!t;
+}
+/* 카드 누르기: 승인된 사람만 앱으로, 나머지는 안내 시트 */
+function onGateClick(e){
+  var card=e.target.closest&&e.target.closest('.card[data-gate]'); if(!card||e.target.closest('.info')) return;
+  if(!me){ e.preventDefault(); authMode='login'; loginSheet(); return; }
+  if(!access.loaded){ e.preventDefault(); toast('확인 중이에요. 잠시 뒤 다시 눌러주세요'); return; }
+  if(counselState()==='approved') return;   // 그대로 이동
+  e.preventDefault(); counselSheet();
+}
+function counselSheet(){
+  var s=access.counsel;
+  if(s==='pending'){
+    openSheet('<h2 style="margin-bottom:4px">승인을 기다리고 있어요</h2>'
+     +'<p class="sub" style="margin:0 0 14px">심화상담 이용 신청이 접수됐어요. 상담사가 확인하면 바로 이용할 수 있어요.'+(access.row&&access.row.requested_at?'<br>신청일 '+esc(access.row.requested_at.slice(0,10)):'')+'</p>'
+     +'<button class="btn" id="ok" type="button" style="width:100%">확인</button>');
+    $('ok').onclick=function(){closeSheet()}; return;
+  }
+  var again=s==='rejected';
+  openSheet('<h2 style="margin-bottom:4px">'+(again?'이번에는 승인되지 않았어요':'심화상담 이용 신청')+'</h2>'
+   +'<p class="sub" style="margin:0 0 12px">'+(again?'다시 신청하면 상담사가 한 번 더 확인해요.':'심화상담은 상담사가 승인한 회원만 이용할 수 있어요. 신청하면 승인 결과가 이 화면에 표시돼요.')+'</p>'
+   +'<div class="consent"><b>정보 제공 동의 (필수)</b>'
+   +'<p>신청하면 내가 입력하는 <b>생년월일시·출생지·성향 설문 답변·상담 질문 답변</b>을 상담사가 상담을 위해 확인하는 것에 동의하는 것으로 봅니다.</p>'
+   +'<p>동의는 언제든 회원 탈퇴로 철회할 수 있고, 탈퇴하면 기록이 모두 삭제돼요.</p></div>'
+   +'<label class="chk"><input type="checkbox" id="agree"> 위 내용에 동의합니다</label>'
+   +'<div id="st" class="status" role="status"></div>'
+   +'<button class="btn" id="req" type="button" style="width:100%;margin-top:6px" disabled>'+(again?'다시 신청하기':'신청하기')+'</button>');
+  $('agree').onchange=function(){$('req').disabled=!$('agree').checked};
+  $('req').onclick=async function(){
+    $('req').disabled=true; status('신청 중…');
+    var r=await sb.rpc('request_app_access',{p_app:'counsel',p_consent_version:CONSENT_VER});
+    if(r.error){status('신청하지 못했어요: '+r.error.message,'err');$('req').disabled=false;return}
+    await refreshAccess(); closeSheet(); toast('신청했어요. 승인되면 이용할 수 있어요');
+  };
+}
+/* 관리자: 신청 관리 */
+function adminSheet(){
+  var L=access.list, rows=L.map(function(x){
+    var name=x.nickname||(x.email?x.email.split('@')[0]:'(이름 없음)');
+    var chip=x.status==='pending'?'<span class="jn-chip warn">대기</span>':x.status==='approved'?'<span class="jn-chip ok">승인</span>':'<span class="jn-chip bad">거절</span>';
+    var when=(x.requested_at||'').slice(0,10);
+    var btns=x.status==='pending'?'<button class="btn sm" data-uid="'+esc(x.user_id)+'" data-act="approved" type="button">승인</button><button class="btn sm ghost" data-uid="'+esc(x.user_id)+'" data-act="rejected" type="button">거절</button>'
+      :x.status==='approved'?'<button class="btn sm ghost" data-uid="'+esc(x.user_id)+'" data-act="rejected" type="button">승인 취소</button>'
+      :'<button class="btn sm ghost" data-uid="'+esc(x.user_id)+'" data-act="approved" type="button">승인</button>';
+    return '<div class="arow"><div class="ainfo"><b>'+esc(name)+'</b>'+chip+'<span class="sub">'+esc(x.email||'')+(when?' · '+esc(when):'')+'</span></div><div class="aact">'+btns+'</div></div>';
+  }).join('');
+  openSheet('<h2 style="margin-bottom:4px">심화상담 신청 관리</h2>'
+   +'<p class="sub" style="margin:0 0 10px">대기 중인 신청이 위에 나와요.</p>'
+   +'<div id="st" class="status" role="status"></div>'
+   +(rows||'<p class="sub">아직 신청이 없어요.</p>'));
+  sheetEl.querySelectorAll('[data-uid]').forEach(function(b){ b.onclick=async function(){
+    var act=b.getAttribute('data-act'); b.disabled=true; status('처리 중…');
+    var r=await sb.rpc('decide_app_access',{p_user:b.getAttribute('data-uid'),p_app:'counsel',p_status:act});
+    if(r.error){status('처리하지 못했어요: '+r.error.message,'err');b.disabled=false;return}
+    await refreshAccess(); adminSheet(); toast(act==='approved'?'승인했어요':'거절했어요');
+  }; });
+}
+
 /* 시작 */
+document.addEventListener('click',onGateClick,true);   // 카드 링크보다 먼저 받는다
 (async function(){
   renderAccountChip();
   if(!sb) return;

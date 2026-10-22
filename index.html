@@ -45,6 +45,16 @@
 .done svg{width:64px;height:64px;fill:none;stroke:var(--ok);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .done circle{stroke:var(--ok-soft);fill:var(--ok-soft);transform-origin:center}
 .done b{font-size:1.05rem}
+/* 승인 신청 */
+.name .jn-chip{margin-left:6px;min-height:22px;padding:0 8px;font-size:.72rem;vertical-align:middle}
+.consent{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.85rem;line-height:1.55}
+.consent p{margin:6px 0 0;color:var(--sub)}
+.chk{display:flex;align-items:center;gap:8px;margin:12px 0 4px;font-weight:600}
+.chk input{width:20px;height:20px;margin:0;accent-color:var(--ink)}
+.arow{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.ainfo{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.ainfo .sub{flex-basis:100%;font-size:.8rem;overflow-wrap:anywhere}
+.aact{display:flex;gap:8px}
 </style>
 </head>
 <body>
@@ -69,7 +79,7 @@ var APPS=[
    icon:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'},
   {name:'만남',   href:BASE+'mating-app/',                 hint:'나에게 맞는 인연을 찾아가요',
    icon:'<path d="M12 20s-7-4.5-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.5-7 10-7 10z"/>'},
-  {name:'심화상담', href:BASE+'counsel-tool/',              hint:'나에 대한 설명이 필요할 때, 고민이 있을 때',
+  {name:'심화상담', href:BASE+'counsel-tool/',              hint:'나에 대한 설명이 필요할 때, 고민이 있을 때', gate:'counsel',
    icon:'<path d="M4 5h16v11H9l-5 4z"/>'},
   {name:'재물운 달력', href:BASE+'lotto-app/',               hint:'날짜별 재물운과 번호 추천',
    icon:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/>'},
@@ -80,9 +90,9 @@ var INFO='<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>';
 var grid=document.getElementById('grid');
 APPS.forEach(function(a,i){
   var el=document.createElement('a');
-  el.className='card'; el.href=a.href;
+  el.className='card'; el.href=a.href; if(a.gate) el.setAttribute('data-gate',a.gate);
   el.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+a.icon+'</svg>'
-    +'<div class="txt"><span class="name">'+a.name+'</span><p class="hint" id="h'+i+'" hidden>'+a.hint+'</p></div>'
+    +'<div class="txt"><span class="name">'+a.name+(a.gate?' <span class="jn-chip warn" id="gate-'+a.gate+'" hidden></span>':'')+'</span><p class="hint" id="h'+i+'" hidden>'+a.hint+'</p></div>'
     +'<button type="button" class="info" aria-label="'+a.name+' 설명 보기" aria-expanded="false" aria-controls="h'+i+'"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+INFO+'</svg></button>';
   var btn=el.querySelector('.info'), hint=el.querySelector('.hint');
   btn.addEventListener('click',function(e){
