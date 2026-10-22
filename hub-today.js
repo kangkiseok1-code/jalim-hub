@@ -1,4 +1,4 @@
-/* 허브 '오늘의 기운' 카드 — 만남 프로필의 생년월일 + 만남 앱과 같은 사주 엔진.
+/* 허브 '오늘의 기운' 카드 — 자림에 저장된 내 정보(공용 출생정보, core_profiles)를 먼저, 없으면 만남 프로필의 생년월일 + 만남 앱과 같은 사주 엔진.
    엔진(약 1MB)은 허브를 연 뒤 로그인한 사람에게만 늦게 불러온다(만남을 한 번이라도 열었다면 브라우저에 이미 있다). */
 var TODAY_ENGINE_URL=ORIGIN+'/mating-app/engine.browser.js';
 var todayEngine=null, todayRun=0;
@@ -61,6 +61,19 @@ function renderMyTiles(){
     return '<a class="mytile jm-press" href="'+MATING_URL+'?go='+x[0]+'"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+x[2]+'</svg>'+x[1]+'</a>';
   }).join('')+'</div>';
 }
+/* 출생정보 후보를 읽는다: [공용 출생정보(core_profiles), 만남 프로필(profiles)] 순. 두 표는 컬럼 이름이 같아 그대로 넘길 수 있다.
+   한쪽이 없거나 읽기에 실패해도 다른 쪽으로 이어가고, 아무것도 없으면 빈 목록(카드 없이 지금 모습 그대로). */
+var TODAY_COLS='nickname,calendar,leap,birth_y,birth_mo,birth_d,birth_h,birth_min,birth_city,time_unknown';
+function readBirth(table,keyCol){
+  return sb.from(table).select(TODAY_COLS).eq(keyCol,me.id).maybeSingle().then(function(q){
+    var p=q&&!q.error?q.data:null;
+    return (p&&p.birth_y&&p.birth_mo&&p.birth_d)?p:null;
+  },function(){ return null; });
+}
+async function loadBirthCandidates(){
+  var r=await Promise.all([readBirth('core_profiles','user_id'),readBirth('profiles','id')]);
+  return r.filter(Boolean);
+}
 /* 로그인한 사람의 프로필을 읽어 카드를 그린다. 로그인 전·생년월일 없음·불러오기 실패는 카드 없이(지금 모습 그대로) */
 async function refreshToday(){
   var box=document.getElementById('today'); if(!box) return;
@@ -69,13 +82,17 @@ async function refreshToday(){
   box.hidden=true; box.innerHTML='';
   if(!sb||!me) return;
   try{
-    var q=await sb.from('profiles').select('nickname,calendar,leap,birth_y,birth_mo,birth_d,birth_h,birth_min,birth_city,time_unknown').eq('id',me.id).maybeSingle();
-    var p=q.data; if(run!==todayRun||!p||!p.birth_y||!p.birth_mo||!p.birth_d) return;
+    var cands=await loadBirthCandidates(); if(run!==todayRun||!cands.length) return;
     box.hidden=false; box.className='today jn-skel'; box.setAttribute('aria-busy','true');   // 엔진을 받는 동안 자리만 잡아 둔다
     var E=await loadTodayEngine(); if(run!==todayRun) return;
-    var f=todayFortune(E,p); if(run!==todayRun) return;
+    var f=null, p=null;
+    for(var i=0;i<cands.length&&!f;i++){   // 공용 정보로 계산이 안 되면(범위 밖 날짜 등) 만남 프로필로 이어간다
+      try{ f=todayFortune(E,cands[i]); if(f) p=cands[i]; }catch(e){ f=null; }
+    }
+    if(run!==todayRun) return;
     if(!f){ box.hidden=true; box.className=''; return; }
-    box.className='today jm-rise'; box.removeAttribute('aria-busy'); box.innerHTML=todayCardHtml(f,p.nickname);
+    var nick=p.nickname||(cands.filter(function(c){return c.nickname})[0]||{}).nickname;   // 별칭이 비어 있으면 다른 쪽 별칭
+    box.className='today jm-rise'; box.removeAttribute('aria-busy'); box.innerHTML=todayCardHtml(f,nick);
   }catch(e){ if(run===todayRun){ box.hidden=true; box.className=''; box.innerHTML=''; } }
 }
 /* hub-auth.js 가 로그인 확인을 이 파일보다 먼저 끝내는 경우(저장된 로그인은 바로 확인돼 이 파일이 내려받아지기 전에 끝남)를 위해,
