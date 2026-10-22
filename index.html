@@ -92,7 +92,6 @@
   <div class="foot">ⓘ를 누르면 설명이 펼쳐져요</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* 선 아이콘 — 만남 앱 MI 세트와 같은 규격 */
 var BASE='https://kangkiseok1-code.github.io/';
@@ -124,6 +123,8 @@ APPS.forEach(function(a,i){
   grid.appendChild(el);
 });
 </script>
+<!-- 로그인 라이브러리(CDN)는 카드 목록을 그린 뒤에 불러온다: CDN이 느리거나 막혀도 카드가 먼저 보이게 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="hub-auth.js"></script>
 <script src="hub-today.js"></script>
 <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});</script>
