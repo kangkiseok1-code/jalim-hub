@@ -45,8 +45,19 @@
 .done svg{width:64px;height:64px;fill:none;stroke:var(--ok);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .done circle{stroke:var(--ok-soft);fill:var(--ok-soft);transform-origin:center}
 .done b{font-size:1.05rem}
+/* 오늘의 기운 카드 */
+.today{display:flex;align-items:center;gap:14px;margin:0 0 14px;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-list)}
+.today[hidden]{display:none}
+.today.jn-skel{min-height:96px;border-color:transparent}
+.today-mark{flex:none;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--serif);font-size:1.7rem;font-weight:700}
+.today-txt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.today-date{font-size:.78rem;color:var(--sub)}
+.today-txt b{font-size:1.05rem;line-height:1.35;word-break:keep-all}
+.today-line{font-size:.85rem;color:var(--ink);line-height:1.5;word-break:keep-all}
+.today-lucky{font-size:.78rem;color:var(--sub)}
 /* 승인 신청 */
 .name .jn-chip{margin-left:6px;min-height:22px;padding:0 8px;font-size:.72rem;vertical-align:middle}
+.name .jn-chip[hidden]{display:none}   /* hidden 속성이 inline-flex에 덮이지 않게 — 상태가 없을 때 빈 알약이 보이던 문제 */
 .consent{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.85rem;line-height:1.55}
 .consent p{margin:6px 0 0;color:var(--sub)}
 .chk{display:flex;align-items:center;gap:8px;margin:12px 0 4px;font-weight:600}
@@ -66,6 +77,7 @@
     </div>
     <button id="acct" class="btn sm" type="button">로그인</button>
   </div>
+  <div class="today" id="today" hidden></div>
   <div class="grid jm-stagger" id="grid"></div>
   <div class="foot">ⓘ를 누르면 설명이 펼쳐져요</div>
 </div>
@@ -103,6 +115,7 @@ APPS.forEach(function(a,i){
 });
 </script>
 <script src="hub-auth.js"></script>
+<script src="hub-today.js"></script>
 <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});</script>
 </body>
 </html>

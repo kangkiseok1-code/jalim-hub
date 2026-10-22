@@ -175,6 +175,7 @@ var access={uid:null,loaded:false,admin:false,counsel:null,row:null,list:[]};   
 function counselState(){ return access.admin?'approved':access.counsel; }
 async function refreshAccess(){
   var uid=me?me.id:null;
+  if(typeof refreshToday==='function') refreshToday();   // 오늘의 기운 카드도 계정이 바뀔 때 함께 새로 그린다
   access={uid:uid,loaded:false,admin:false,counsel:null,row:null,list:[]};
   renderGate();
   if(!sb||!me) return;
