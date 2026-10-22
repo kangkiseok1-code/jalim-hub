@@ -78,3 +78,6 @@ async function refreshToday(){
     box.className='today jm-rise'; box.removeAttribute('aria-busy'); box.innerHTML=todayCardHtml(f,p.nickname);
   }catch(e){ if(run===todayRun){ box.hidden=true; box.className=''; box.innerHTML=''; } }
 }
+/* hub-auth.js 가 로그인 확인을 이 파일보다 먼저 끝내는 경우(저장된 로그인은 바로 확인돼 이 파일이 내려받아지기 전에 끝남)를 위해,
+   이 파일이 준비된 시점에 이미 로그인돼 있으면 한 번 그린다. (아직 확인 전이면 hub-auth.js 가 계정을 확인한 뒤 알아서 부른다) */
+if(typeof me!=='undefined'&&me) refreshToday();
