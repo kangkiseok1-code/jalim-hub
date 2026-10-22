@@ -6,7 +6,7 @@ var me=null, authMode='login';
 
 /* 돌아갈 주소(next): 같은 도메인의 자림 앱 4곳만 허용 */
 var ORIGIN='https://kangkiseok1-code.github.io';
-var ALLOW=['/mating-app/','/counsel-tool/','/lotto-app/','/Team-maker/'];
+var ALLOW=['/mating-app/','/counsel-tool/','/lotto-app/','/Team-maker/','/life-walk/'];
 function safeNext(raw){
   if(!raw) return null;
   try{
@@ -133,6 +133,7 @@ function accountSheet(){
     '<h2 style="margin-bottom:2px">내 계정</h2>'
    +'<p class="sub" style="margin:0">'+esc(displayName(u))+(u.email?' · '+esc(u.email):'')+'</p>'
    +'<div style="margin:10px 0 0"><span class="jn-chip ok">'+esc(providerLabel(u)||'로그인됨')+' 로그인 중</span>'+accessChipHtml()+'</div>'
+   +'<div id="shared"></div>'
    +'<div class="jn-list">'
    +(access.admin?'<button class="jn-row" id="adm" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="jn-main">심화상담 신청 관리<span class="jn-s">승인·거절</span></span>'+(pendingCount()?'<span class="jn-badge">'+pendingCount()+'</span>':'')+'</button>':'')
    +'<button class="jn-row" id="lo" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg><span class="jn-main">로그아웃</span></button>'
@@ -141,6 +142,49 @@ function accountSheet(){
   $('lo').onclick=doLogout;
   $('lv').onclick=confirmLeave;
   if($('adm')) $('adm').onclick=adminSheet;
+  loadShared();
+}
+
+/* 내 정보 공유 — 인생 다시 걷기에서 동의하고 저장한 '공용 출생정보'(core_profiles)와 걷기 기록(journey_answers).
+   둘 다 본인만 읽고 지울 수 있다. 동의 철회 = 공용 출생정보 삭제(각 앱에 따로 입력한 정보·걷기 기록은 그대로). */
+var SHIELD='<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>', FOOT='<circle cx="13" cy="4.5" r="2"/><path d="M10 21l2-6-2.5-2.5 1.5-4 3 1.5 2 3.5M12 15l3 6M9.5 10.5L7 12"/>';
+async function loadShared(){
+  var box=$('shared'); if(!box||!sb||!me) return;
+  var uid=me.id;
+  try{
+    var c=await sb.from('core_profiles').select('nickname,birth_y,birth_mo,birth_d,birth_city').eq('user_id',uid).maybeSingle();
+    var a=await sb.from('journey_answers').select('year').eq('user_id',uid);
+    if(c.error||a.error) return;
+    if(!$('shared')||!me||me.id!==uid) return;   // 그사이 시트가 닫히거나 계정이 바뀜
+    var core=c.data, n=(a.data||[]).length, h='';
+    if(core){
+      var who=(core.nickname?core.nickname+' · ':'')+core.birth_y+'.'+core.birth_mo+'.'+core.birth_d+(core.birth_city?' · '+core.birth_city:'');
+      h+='<button class="jn-row" id="wd" type="button"><svg class="ic" viewBox="0 0 24 24">'+SHIELD+'</svg><span class="jn-main">공용 출생정보 동의 철회<span class="jn-s">'+esc(who)+' · 다른 앱이 자동으로 쓰는 걸 멈춰요</span></span></button>';
+    }
+    if(n) h+='<button class="jn-row" id="wa" type="button"><svg class="ic" viewBox="0 0 24 24">'+FOOT+'</svg><span class="jn-main">걷기 기록 지우기<span class="jn-s">인생 다시 걷기에서 남긴 '+n+'곳</span></span></button>';
+    box.innerHTML=h
+      ?'<p class="sec-label" style="margin:16px 2px 4px">내 정보 공유</p><div class="jn-list">'+h+'</div>'
+      :'<p class="sub" style="margin:14px 0 0;font-size:.8rem">저장된 공용 출생정보가 없어요. 인생 다시 걷기에서 동의하면 다른 앱에서도 자동으로 채워져요.</p>';
+    if($('wd')) $('wd').onclick=function(){confirmShared('core',who)};
+    if($('wa')) $('wa').onclick=function(){confirmShared('answers',n)};
+  }catch(e){}
+}
+function confirmShared(kind,info){
+  var w=kind==='core';
+  openSheet(
+    '<h2 style="margin-bottom:4px">'+(w?'동의를 철회할까요?':'걷기 기록을 지울까요?')+'</h2>'
+   +'<p class="sub" style="margin:0 0 14px">'+(w
+     ?'자림에 저장된 공용 출생정보('+esc(info)+')가 삭제돼요. 만남·재물운 등 각 앱에 따로 입력해 둔 정보와 걷기 기록은 그대로예요. 나중에 인생 다시 걷기에서 다시 동의하고 저장할 수 있어요.'
+     :'인생 다시 걷기에서 남긴 답 '+esc(info)+'곳이 모두 삭제되고 되돌릴 수 없어요. 이 기기에 남은 기록은 앱에서 따로 지울 수 있어요.')+'</p>'
+   +'<div id="st" class="status" role="status"></div>'
+   +'<div style="display:flex;gap:10px"><button class="btn ghost" style="flex:1" id="no" type="button">취소</button><button class="btn danger" style="flex:1" id="yes" type="button">'+(w?'철회하기':'지우기')+'</button></div>');
+  $('no').onclick=accountSheet;
+  $('yes').onclick=async function(){
+    $('yes').disabled=true; status('처리 중…');
+    var r=await sb.from(w?'core_profiles':'journey_answers').delete().eq('user_id',me.id);
+    if(r.error){status('처리하지 못했어요: '+r.error.message,'err');$('yes').disabled=false;return}
+    toast(w?'동의를 철회했어요':'걷기 기록을 지웠어요'); accountSheet();
+  };
 }
 async function doLogout(){
   await sb.auth.signOut();me=null;closeSheet();renderAccountChip();toast('로그아웃했어요');
@@ -148,7 +192,7 @@ async function doLogout(){
 function confirmLeave(){
   openSheet(
     '<h2 style="margin-bottom:4px">정말 탈퇴하시겠어요?</h2>'
-   +'<p class="sub" style="margin:0 0 14px">만남·심화상담·재물운·팀메이커의 계정, 프로필, 저장한 기록이 모두 영구 삭제되고 되돌릴 수 없어요.</p>'
+   +'<p class="sub" style="margin:0 0 14px">만남·심화상담·재물운·팀메이커의 계정, 프로필, 공용 출생정보, 걷기 기록, 저장한 기록이 모두 영구 삭제되고 되돌릴 수 없어요.</p>'
    +'<div id="st" class="status" role="status"></div>'
    +'<div style="display:flex;gap:10px"><button class="btn ghost" style="flex:1" id="no" type="button">취소</button><button class="btn danger" style="flex:1" id="yes" type="button">탈퇴하기</button></div>');
   $('no').onclick=accountSheet;
