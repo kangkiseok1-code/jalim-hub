@@ -6,7 +6,7 @@ var me=null, authMode='login';
 
 /* 돌아갈 주소(next): 같은 도메인의 자림 앱 4곳만 허용 */
 var ORIGIN='https://kangkiseok1-code.github.io';
-var ALLOW=['/mating-app/','/counsel-tool/','/lotto-app/','/Team-maker/','/life-walk/','/checkin/'];
+var ALLOW=['/mating-app/','/analysis-app/','/counsel-tool/','/lotto-app/','/Team-maker/','/life-walk/','/checkin/'];
 function safeNext(raw){
   if(!raw) return null;
   try{

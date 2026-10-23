@@ -38,10 +38,10 @@ function todayFortune(E,p){
   var d=TODAY_BY_GROUP[TODAY_GROUP[sib]||'비겁'];
   return {elem:elem,title:d.t,line:d.line,date:(now.getMonth()+1)+'월 '+now.getDate()+'일 · '+'일월화수목금토'.charAt(now.getDay())+'요일'};
 }
-var MATING_URL=ORIGIN+'/mating-app/';
+var ANALYSIS_URL=ORIGIN+'/analysis-app/';
 function todayCardHtml(f,nick){
   var e=TODAY_ELEM[f.elem];
-  return '<a class="today-in jm-press" href="'+MATING_URL+'?go=saju" aria-label="내 사주 분석 보기">'
+  return '<a class="today-in jm-press" href="'+ANALYSIS_URL+'?go=saju" aria-label="내 사주 분석 보기">'
     +'<div class="today-mark" style="background:'+e.c+'" aria-hidden="true">'+e.h+'</div>'
     +'<div class="today-txt"><span class="today-date">'+esc(f.date)+'</span>'
     +'<b>'+(nick?esc(nick)+'님, ':'')+'오늘은 '+e.h+'의 날이에요</b>'
@@ -58,7 +58,7 @@ function renderMyTiles(){
   if(!me){ box.hidden=true; box.innerHTML=''; return; }
   box.hidden=false;
   box.innerHTML='<div class="sec-label">나의 분석</div><div class="mytile-row">'+MY_TILES.map(function(x){
-    return '<a class="mytile jm-press" href="'+MATING_URL+'?go='+x[0]+'"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+x[2]+'</svg>'+x[1]+'</a>';
+    return '<a class="mytile jm-press" href="'+ANALYSIS_URL+'?go='+x[0]+'"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+x[2]+'</svg>'+x[1]+'</a>';
   }).join('')+'</div>';
 }
 /* 출생정보 후보를 읽는다: [공용 출생정보(core_profiles), 만남 프로필(profiles)] 순. 두 표는 컬럼 이름이 같아 그대로 넘길 수 있다.
