@@ -221,7 +221,7 @@ function renderAccountChip(){
 }
 
 /* 앱 입장 승인 — 심화상담(counsel)만 승인제: 가입 → 정보공유 동의 신청 → 관리자 승인 → 입장 */
-var CONSENT_VER='counsel-v1-2026-10-22';
+var CONSENT_VER='counsel-v2-2026-10-24';
 var access={uid:null,loaded:false,admin:false,counsel:null,row:null,list:[]};   // counsel: null|'pending'|'approved'|'rejected'
 function counselState(){ return access.admin?'approved':access.counsel; }
 async function refreshAccess(){
@@ -280,7 +280,8 @@ function counselSheet(){
   openSheet('<h2 style="margin-bottom:4px">'+(again?'이번에는 승인되지 않았어요':'심화상담 이용 신청')+'</h2>'
    +'<p class="sub" style="margin:0 0 12px">'+(again?'다시 신청하면 상담사가 한 번 더 확인해요.':'심화상담은 상담사가 승인한 회원만 이용할 수 있어요. 신청하면 승인 결과가 이 화면에 표시돼요.')+'</p>'
    +'<div class="consent"><b>정보 제공 동의 (필수)</b>'
-   +'<p>신청하면 내가 입력하는 <b>생년월일시·출생지·성향 설문 답변·상담 질문 답변</b>을 상담사가 상담을 위해 확인하는 것에 동의하는 것으로 봅니다.</p>'
+   +'<p>신청하면 내가 입력하는 <b>생년월일시·출생지·상담 질문 답변·인생 사건</b>을 상담사가 상담을 위해 확인하는 것에 동의하는 것으로 봅니다.</p>'
+   +'<p>상담을 보낼 때 <b>분석 앱의 성향·대인관계 결과, 지인 평가 요약, 인생 다시 걷기 기록</b>도 함께 보낼 수 있어요. 지인 평가는 응답을 평균으로 합친 요약만 가고, 응답한 지인의 이름·관계는 가지 않아요. 보내기 전에 항목마다 직접 고르며, 고르지 않은 것은 전달되지 않아요.</p>'
    +'<p>동의는 언제든 회원 탈퇴로 철회할 수 있고, 탈퇴하면 기록이 모두 삭제돼요.</p></div>'
    +'<label class="chk"><input type="checkbox" id="agree"> 위 내용에 동의합니다</label>'
    +'<div id="st" class="status" role="status"></div>'
