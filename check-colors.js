@@ -5,7 +5,7 @@
 // 원칙: 색은 jalim-base.css 의 토큰(var(--…))으로 쓴다. 토큰 값을 정의하는 줄(--이름:#색)과 흰색·검정(글자·그림자)은 센 대상이 아니다.
 const fs=require('fs'),path=require('path');
 const root=path.resolve(__dirname,'..');
-const FILES=['jalim-hub/index.html','jalim-hub/hub-auth.js','jalim-hub/hub-today.js','mating-app/index.html','counsel-tool/index.html','lotto-app/index.html','ohaeng-project/team-maker.html'];
+const FILES=['jalim-hub/index.html','jalim-hub/hub-auth.js','jalim-hub/hub-today.js','mating-app/index.html','analysis-app/index.html','counsel-tool/index.html','lotto-app/index.html','ohaeng-project/team-maker.html'];
 const BASE_FILE=path.join(__dirname,'color-baseline.json');
 const ALWAYS_OK=new Set(['#fff','#ffffff','#000','#000000']);   // 색 위의 글자·그림자 등
 
