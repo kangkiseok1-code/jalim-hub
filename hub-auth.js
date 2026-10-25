@@ -210,7 +210,7 @@ function confirmLeave(){
 
 /* 상단 계정 버튼 */
 function renderAccountChip(){
-  var b=$('acct');
+  var b=$('acct'); renderShareBtn();
   if((me?me.id:null)!==access.uid) refreshAccess();
   if(me){
     b.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
@@ -218,6 +218,18 @@ function renderAccountChip(){
   }else{
     b.textContent='로그인';b.setAttribute('aria-label','로그인');b.className='btn sm';b.onclick=function(){authMode='login';loginSheet()};
   }
+}
+
+/* 공유하기 — 분석 앱이 내 분석을 열 때 이 브라우저(같은 사이트 저장소)에 남겨 둔 내 타입 카드 링크를 보낸다. 한 번도 안 열었으면 버튼이 안 보인다 */
+function renderShareBtn(){
+  var sb=$('hshare'); if(!sb) return;
+  var rec=null; try{ rec=me?JSON.parse(localStorage.getItem('jalim_share_'+me.id)||'null'):null }catch(e){}
+  sb.hidden=!(rec&&rec.url);
+  sb.onclick=async function(){
+    var text='내 사주 타입은 '+(rec.name||'')+'! 나도 해보기';
+    if(navigator.share){ try{ await navigator.share({title:'내 타입 카드',text:text,url:rec.url}) }catch(_){} return }
+    try{ await navigator.clipboard.writeText(rec.url); toast('링크가 복사됐어요') }catch(_){ prompt('아래 링크를 복사해 보내세요',rec.url) }
+  };
 }
 
 /* 앱 입장 승인 — 심화상담(counsel)만 승인제: 가입 → 정보공유 동의 신청 → 관리자 승인 → 입장 */

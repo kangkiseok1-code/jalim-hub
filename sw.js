@@ -1,5 +1,5 @@
 /* 자림 허브 PWA 서비스 워커 — 껍데기 네트워크 우선, CDN·Supabase 통과 */
-const CACHE = 'jalim-hub-v18';
+const CACHE = 'jalim-hub-v19';
 const SHELL = ['./', 'index.html', 'hub-auth.js', 'hub-today.js', 'jalim-base.css', 'icon-192.png', 'icon-512.png', 'manifest.webmanifest'];
 
 self.addEventListener('install', e => {
