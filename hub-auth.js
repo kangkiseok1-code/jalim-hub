@@ -226,7 +226,7 @@ function renderShareBtn(){
   var rec=null; try{ rec=me?JSON.parse(localStorage.getItem('jalim_share_'+me.id)||'null'):null }catch(e){}
   sb.hidden=!(rec&&rec.url);
   sb.onclick=async function(){
-    var text='내 사주 타입은 '+(rec.name||'')+'! 나도 해보기';
+    var text=(rec.nick?rec.nick+'님의':'내')+' 사주 타입은 '+(rec.name||'')+'! 나도 해보기';
     if(navigator.share){ try{ await navigator.share({title:'내 타입 카드',text:text,url:rec.url}) }catch(_){} return }
     try{ await navigator.clipboard.writeText(rec.url); toast('링크가 복사됐어요') }catch(_){ prompt('아래 링크를 복사해 보내세요',rec.url) }
   };
