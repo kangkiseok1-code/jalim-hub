@@ -1,12 +1,14 @@
-/* 허브 '오늘의 기운' 카드 — 자림에 저장된 내 정보(공용 출생정보, core_profiles)를 먼저, 없으면 만남 프로필의 생년월일 + 만남 앱과 같은 사주 엔진.
-   엔진(약 1MB)은 허브를 연 뒤 로그인한 사람에게만 늦게 불러온다(만남을 한 번이라도 열었다면 브라우저에 이미 있다). */
-var TODAY_ENGINE_URL=ORIGIN+'/mating-app/engine.browser.js';
+/* 허브 '오늘의 기운' 카드 — 자림에 저장된 내 정보(공용 출생정보, core_profiles)를 먼저, 없으면 만남 프로필의 생년월일 + 앱들과 같은 공유 사주 엔진.
+   엔진(약 1MB)은 허브를 연 뒤 로그인한 사람에게만 늦게 불러온다(공유 엔진이라 다른 앱에서 이미 받았다면 브라우저에 있다). */
+// 공유 엔진(jalim-engine) 버전 고정 + 지문(SRI) — 파일이 바뀌면 브라우저가 실행을 거부한다
+var TODAY_ENGINE_URL=ORIGIN+'/jalim-engine/v1.0.0/engine.js';
+var TODAY_ENGINE_SRI='sha384-7XdpymHBweGdT08+OrhD0qlQUNelsJR+Bi/bRvSnlPLH8Psj5GQxN8odmLegiQGA';
 var todayEngine=null, todayRun=0;
 function loadTodayEngine(){
   if(window.OhaengEngine) return Promise.resolve(window.OhaengEngine);
   if(todayEngine) return todayEngine;
   todayEngine=new Promise(function(ok,fail){
-    var s=document.createElement('script'); s.src=TODAY_ENGINE_URL;
+    var s=document.createElement('script'); s.src=TODAY_ENGINE_URL; s.integrity=TODAY_ENGINE_SRI; s.crossOrigin='anonymous';
     s.onload=function(){ window.OhaengEngine?ok(window.OhaengEngine):fail(new Error('engine')) };
     s.onerror=function(){ todayEngine=null; fail(new Error('engine load')) };
     document.head.appendChild(s);
