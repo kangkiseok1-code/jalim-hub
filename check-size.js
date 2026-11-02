@@ -12,7 +12,7 @@ const EXTS=new Set(['.js','.mjs','.ts','.html','.css']);
 const SKIP_DIRS=new Set(['node_modules','.git','_engine-backups','docs','jalim-engine','jamidusu-study','yongsin-calibration','.claude']);
 // 예외: 만세력·인물 데이터, 외부 라이브러리, 앱 안 엔진 사본(빌드 결과물), 압축 파일
 const EXEMPT_FILES=new Set(['ohaeng-project/engine/src/saju/manse-inline.js','ohaeng-project/engine/src/persona/characters.js','lotto-app/jsQR.min.js']);
-const isExempt=rel=>EXEMPT_FILES.has(rel)||/(^|\/)engine\.browser\.js$/.test(rel)||/\.min\.(js|css)$/.test(rel);
+const isExempt=rel=>EXEMPT_FILES.has(rel)||/(^|\/)judge-server\/dist\//.test(rel)||/(^|\/)engine\.browser\.js$/.test(rel)||/\.min\.(js|css)$/.test(rel);
 
 function walk(dir,out){
   for(const e of fs.readdirSync(dir,{withFileTypes:true})){
