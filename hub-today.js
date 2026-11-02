@@ -2,7 +2,7 @@
    엔진(약 1MB)은 허브를 연 뒤 로그인한 사람에게만 늦게 불러온다(공유 엔진이라 다른 앱에서 이미 받았다면 브라우저에 있다). */
 // 공유 엔진(jalim-engine) 버전 고정 + 지문(SRI) — 파일이 바뀌면 브라우저가 실행을 거부한다
 var TODAY_ENGINE_URL=ORIGIN+'/jalim-engine/v2.0.0/engine.js';
-var TODAY_ENGINE_SRI='sha384-FZoqpEanXyTkeuaYz/3aHqJ7t65anISko358tUaXofQoxujyomMLUbibdjox85EW';
+var TODAY_ENGINE_SRI='sha384-6x0HmVdCE7oAUHe/TX9WZMXpNAlE3wKfvlT7Sy5A4Qz9JqXgWkcBAr5kIS42AR7A';
 var todayEngine=null, todayRun=0;
 function loadTodayEngine(){
   if(window.OhaengEngine) return Promise.resolve(window.OhaengEngine);
