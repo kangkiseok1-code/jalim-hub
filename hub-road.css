@@ -3,14 +3,6 @@
 .road-wrap[hidden]{display:none}
 .road-wrap{margin:0 0 14px}
 .road-h{font-family:var(--serif);font-size:1.3rem;line-height:1.4;margin:0 0 12px;word-break:keep-all;text-wrap:balance}
-.road-admin{margin:0 0 12px;padding:14px 16px;background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-list)}
-.road-admin h3{margin:0 0 8px;font-size:.9rem}
-.road-admin .rows{display:flex;flex-direction:column;gap:6px}
-.road-admin button.row{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 0;background:none;border:0;border-top:1px solid var(--line);font:inherit;font-size:.9rem;color:var(--ink);text-align:left;cursor:pointer;touch-action:manipulation}
-.road-admin button.row b{font-size:1rem}
-.road-more{display:flex;flex-direction:column;gap:10px;margin:0 0 14px}
-.road-more a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-list);color:var(--ink);font-weight:600;text-decoration:none;touch-action:manipulation}
-.road-more small{font-weight:400;color:var(--sub);font-size:.78rem}
 /* 나만의 길 그림 (hub-road-art.js) — 색은 모두 jalim-base.css 토큰 */
 .rd-art{position:relative;width:100%;aspect-ratio:330/600;margin:0 0 8px}
 .rd-art svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}

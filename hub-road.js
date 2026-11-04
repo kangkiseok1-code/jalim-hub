@@ -31,26 +31,33 @@ async function loadRoadData(){
   roadData=d; renderRoad();
 }
 
-function roadAdmin(){
-  if(!access||!access.admin||!access.loaded) return '';
-  var n=pendingCount();
-  return '<div class="road-admin"><h3>관리자 전용 <span class="jn-chip">관리자 모드</span></h3><div class="rows">'
-    +'<button class="row" id="road-adm" type="button"><span>심화상담 승인 대기</span><b>'+n+'</b></button></div></div>';
+/* 관리자 버튼: 공유하기 옆에 같은 모양으로. 관리자 로그인일 때만 보이고, 누르면 관리 메뉴(심화상담 신청 관리 · 팀메이커) */
+function renderAdminBtn(){
+  var host=document.querySelector('.head-acts'); if(!host) return;
+  var b=document.getElementById('hadmin'), on=!!(me&&access&&access.admin&&access.loaded);
+  if(!on){ if(b) b.remove(); return; }
+  if(!b){
+    b=document.createElement('button'); b.id='hadmin'; b.type='button'; b.className='btn sm'; b.onclick=adminMenuSheet;
+    var ref=document.getElementById('hshare'); host.insertBefore(b,ref?ref.nextSibling:host.firstChild);
+  }
+  var n=pendingCount(); b.textContent='관리자'+(n?' '+n:''); b.setAttribute('aria-label','관리자 메뉴'+(n?', 승인 대기 '+n+'건':''));
 }
-function roadMore(){
-  var h='';
-  if(access&&access.admin&&access.loaded) h+='<a href="'+BASE+'Team-maker/team-maker.html">팀메이커 <small>관리자 전용</small></a>';
-  return h?'<div class="road-more">'+h+'</div>':'';
+function adminMenuSheet(){
+  var n=pendingCount();
+  openSheet('<h2 style="margin-bottom:4px">관리자</h2><p class="sub" style="margin:0 0 8px">관리자에게만 보여요</p><div class="jn-list">'
+   +'<button class="jn-row" id="am-c" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="jn-main">심화상담 신청 관리<span class="jn-s">승인 대기 '+n+'건</span></span>'+(n?'<span class="jn-badge">'+n+'</span>':'')+'</button>'
+   +'<button class="jn-row" id="am-t" type="button"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5.5 6.5-5.5s5.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 010 7M18 14.5c1.8.7 3 2.6 3.5 5.5"/></svg><span class="jn-main">팀메이커<span class="jn-s">관리자 전용</span></span></button></div>');
+  document.getElementById('am-c').onclick=adminSheet;
+  document.getElementById('am-t').onclick=function(){ location.href=BASE+'Team-maker/team-maker.html'; };
 }
 function renderRoad(){
   var box=document.getElementById('road'); if(!box) return;
   try{
     var d=(me&&roadData.uid===me.id)?roadData:{core:false,walk:0,checkins:0,today:null,recent:[false,false,false,false,false],nick:''};
     box.innerHTML=(typeof idleBannerHtml==='function'?idleBannerHtml():'')+'<h2 class="road-h">'+(me?(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요':'나를 알아가는 길')+'</h2>'
-      +roadAdmin()+roadArtHtml(d)+roadMore();
+      +roadArtHtml(d);
     box.hidden=false; document.body.classList.add('in-road');
-    var adm=document.getElementById('road-adm'); if(adm) adm.onclick=adminSheet;
-    wireRoadStories(box);
+    wireRoadStories(box); renderAdminBtn();
     if(typeof wireIdleBanner==='function') wireIdleBanner();
   }catch(e){ box.hidden=true; box.innerHTML=''; document.body.classList.remove('in-road'); }   // 문제가 생기면 지금까지의 허브 모습으로
 }
