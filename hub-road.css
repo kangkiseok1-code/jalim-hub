@@ -1,0 +1,37 @@
+/* 허브 첫 화면의 '길' — 로그인한 사람에게만 보인다(hub-road.js). 로그인 전 화면은 그대로. */
+.in-road .exp,.in-road #mytiles,.in-road #apps-label,.in-road #grid{display:none}
+.road-wrap[hidden]{display:none}
+.road-wrap{margin:0 0 14px}
+.road-h{font-family:var(--serif);font-size:1.3rem;line-height:1.4;margin:0 0 12px;word-break:keep-all;text-wrap:balance}
+.road-admin{margin:0 0 12px;padding:14px 16px;background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-list)}
+.road-admin h3{margin:0 0 8px;font-size:.9rem}
+.road-admin .rows{display:flex;flex-direction:column;gap:6px}
+.road-admin button.row{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 0;background:none;border:0;border-top:1px solid var(--line);font:inherit;font-size:.9rem;color:var(--ink);text-align:left;cursor:pointer;touch-action:manipulation}
+.road-admin button.row b{font-size:1rem}
+.road{display:flex;flex-direction:column;gap:10px;margin:0 0 12px}
+.node{position:relative;margin:0;padding:14px 16px 14px 46px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-list)}
+.node::before{content:"";position:absolute;left:18px;top:18px;width:14px;height:14px;border-radius:50%;border:2px solid var(--line-strong);background:var(--card)}
+.node.is-done::before{background:var(--ok);border-color:var(--ok)}
+.node.is-now{border-color:var(--gold);background:var(--gold-soft)}
+.node.is-now::before{border-color:var(--gold);background:var(--gold)}
+.node .nm{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;font-size:1rem;font-weight:700;color:var(--ink);text-decoration:none;min-height:24px;touch-action:manipulation}
+.node .nm .jn-chip{min-height:22px;padding:0 8px;font-size:.72rem}
+.node .nm .jn-chip[hidden]{display:none}
+.node .ds{margin:2px 0 0;font-size:.82rem;color:var(--sub)}
+.node .side{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.node .side a{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border-radius:var(--r-pill);border:1px solid var(--line-strong);background:var(--card);color:var(--ink);font-size:.82rem;font-weight:600;text-decoration:none;white-space:nowrap;touch-action:manipulation}
+.node .side a.go{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.node .side a.gold{background:var(--gold-soft);border-color:var(--gold);color:var(--gold-ink)}
+@media(hover:hover){.node .side a:hover{background:var(--surface-2)}.node .side a.go:hover{background:var(--ink)}}
+.ck-card{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-list);color:inherit;text-decoration:none;touch-action:manipulation}
+.ck-card b{display:block;font-size:.95rem}
+.ck-card span{font-size:.82rem;color:var(--sub)}
+.ck-card .ck-dots{display:flex;gap:3px;flex:none}
+.ck-card .ck-dots i{width:8px;height:8px;border-radius:50%;background:var(--line-strong)}
+.ck-card .ck-dots i.on{background:var(--gold)}
+.road-more{display:flex;flex-direction:column;gap:10px;margin:0 0 14px}
+.road-more a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-list);color:var(--ink);font-weight:600;text-decoration:none;touch-action:manipulation}
+.road-more small{font-weight:400;color:var(--sub);font-size:.78rem}
+.warnbar{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;padding:14px 16px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:var(--r-list);font-size:.85rem;color:var(--ink)}
+.warnbar b{font-size:.95rem}
+.warnbar .btn{align-self:flex-start;margin-top:4px}

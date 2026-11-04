@@ -21,6 +21,8 @@ var FRESH_LOGIN=/[?&]code=|access_token=/.test(location.search+location.hash);
 var NEXT=safeNext(new URLSearchParams(location.search).get('next'));
 /* ?manage=counsel : 관리자가 심화상담 신청 관리 화면을 바로 열고 싶을 때(심화상담 홈의 "승인 대기" 줄에서 옴) */
 var MANAGE=new URLSearchParams(location.search).get('manage')==='counsel';
+/* ?apply=counsel : 분석의 "심화상담 신청하기"에서 옴 — 로그인돼 있으면 신청(또는 신청 상태) 화면을 바로 연다 */
+var APPLY=new URLSearchParams(location.search).get('apply')==='counsel';
 
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -239,6 +241,7 @@ function counselState(){ return access.admin?'approved':access.counsel; }
 async function refreshAccess(){
   var uid=me?me.id:null;
   if(typeof refreshToday==='function') refreshToday();   // 오늘의 기운 카드도 계정이 바뀔 때 함께 새로 그린다
+  if(typeof loadRoadData==='function') loadRoadData();   // 첫 화면의 길도 같이
   access={uid:uid,loaded:false,admin:false,counsel:null,row:null,list:[]};
   renderGate();
   if(!sb||!me) return;
@@ -250,7 +253,8 @@ async function refreshAccess(){
   }catch(e){}
   if(access.uid!==uid) return;   // 그사이 다른 계정으로 바뀜
   access.loaded=true; renderGate();
-  openManageIfRequested();
+  if(typeof renderRoad==='function') renderRoad();   // 관리자 칸·팀메이커는 승인 정보가 온 뒤에 보인다
+  openManageIfRequested(); openApplyIfRequested();
 }
 function openManageIfRequested(){
   if(!MANAGE||!me) return;
@@ -258,10 +262,15 @@ function openManageIfRequested(){
   try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){}   // 새로고침해도 다시 열리지 않게 주소에서 지운다
   if(access.admin) adminSheet(); else toast('관리자만 열 수 있어요');
 }
+function openApplyIfRequested(){
+  if(!APPLY||!me) return;
+  APPLY=false;
+  try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){}
+  if(counselState()==='approved') location.href=BASE+'counsel-tool/'; else counselSheet();
+}
 function pendingCount(){ return access.list.filter(function(x){return x.status==='pending'}).length }
 /* 카드의 상태 표시 */
 function renderGate(){
-  var chip=document.getElementById('gate-counsel'); if(!chip) return;
   var t='',k='warn';
   if(me&&access.loaded){
     if(access.admin){ var n=pendingCount(); if(n) t='신청 '+n+'건' }
@@ -269,12 +278,12 @@ function renderGate(){
     else if(access.counsel==='rejected'){t='승인 안 됨';k='bad'}
     else if(access.counsel!=='approved') t='신청 필요';
   }
-  chip.textContent=t; chip.className='jn-chip '+k; chip.hidden=!t;
+  ['gate-counsel','gate-counsel-road'].forEach(function(id){ var chip=document.getElementById(id); if(!chip) return; chip.textContent=t; chip.className='jn-chip '+k; chip.hidden=!t; });
 }
 /* 카드 누르기: 승인된 사람만 앱으로, 나머지는 안내 시트 */
 function onGateClick(e){
-  var card=e.target.closest&&e.target.closest('.card[data-gate]'); if(!card||e.target.closest('.info')) return;
-  if(access.admin&&access.loaded&&pendingCount()&&e.target.closest('#gate-counsel')){ e.preventDefault(); adminSheet(); return; }
+  var card=e.target.closest&&e.target.closest('[data-gate]'); if(!card||e.target.closest('.info')) return;
+  if(access.admin&&access.loaded&&pendingCount()&&e.target.closest('#gate-counsel,#gate-counsel-road')){ e.preventDefault(); adminSheet(); return; }
   if(!me){ e.preventDefault(); authMode='login'; loginSheet(); return; }
   if(!access.loaded){ e.preventDefault(); toast('확인 중이에요. 잠시 뒤 다시 눌러주세요'); return; }
   if(counselState()==='approved') return;   // 그대로 이동
@@ -291,6 +300,7 @@ function counselSheet(){
   var again=s==='rejected';
   openSheet('<h2 style="margin-bottom:4px">'+(again?'이번에는 승인되지 않았어요':'심화상담 이용 신청')+'</h2>'
    +'<p class="sub" style="margin:0 0 12px">'+(again?'다시 신청하면 상담사가 한 번 더 확인해요.':'심화상담은 상담사가 승인한 회원만 이용할 수 있어요. 신청하면 승인 결과가 이 화면에 표시돼요.')+'</p>'
+   +'<div id="apply-recs"></div>'
    +'<div class="consent"><b>정보 제공 동의 (필수)</b>'
    +'<p>신청하면 내가 입력하는 <b>생년월일시·출생지·상담 질문 답변·인생 사건</b>을 상담사가 상담을 위해 확인하는 것에 동의하는 것으로 봅니다.</p>'
    +'<p>상담을 보낼 때 <b>분석 앱의 성향·대인관계 결과, 지인 평가 요약, 인생 다시 걷기 기록</b>도 함께 보낼 수 있어요. 지인 평가는 응답을 평균으로 합친 요약만 가고, 응답한 지인의 이름·관계는 가지 않아요. 보내기 전에 항목마다 직접 고르며, 고르지 않은 것은 전달되지 않아요.</p>'
@@ -298,6 +308,7 @@ function counselSheet(){
    +'<label class="chk"><input type="checkbox" id="agree"> 위 내용에 동의합니다</label>'
    +'<div id="st" class="status" role="status"></div>'
    +'<button class="btn" id="req" type="button" style="width:100%;margin-top:6px" disabled>'+(again?'다시 신청하기':'신청하기')+'</button>');
+  if(typeof loadApplyRecs==='function') loadApplyRecs();
   $('agree').onchange=function(){$('req').disabled=!$('agree').checked};
   $('req').onclick=async function(){
     $('req').disabled=true; status('신청 중…');
@@ -339,7 +350,7 @@ document.addEventListener('click',onGateClick,true);   // 카드 링크보다 �
   renderAccountChip();
   if(me&&FRESH_LOGIN){showDone('로그인됐어요',function(){if(NEXT)location.replace(NEXT);else closeDoneSheet()});return}   // 카카오 등에서 방금 돌아옴
   if(me&&NEXT){location.replace(NEXT);return}
-  if(!me&&(NEXT||MANAGE)){authMode='login';loginSheet()}
+  if(!me&&(NEXT||MANAGE||APPLY)){authMode='login';loginSheet()}
   sb.auth.onAuthStateChange(function(ev,s){
     var u=s?s.user:null;
     if((u&&u.id)!==(me&&me.id)){me=u;renderAccountChip()}

@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="jalim-base.css">
+<link rel="stylesheet" href="hub-road.css">
 <style>
 #app{max-width:640px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 18px max(60px,env(safe-area-inset-bottom))}
 .head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
@@ -110,10 +111,11 @@
     </div>
     <div class="head-acts"><button id="hshare" class="btn sm" type="button" hidden>공유하기</button><button id="acct" class="btn sm" type="button">로그인</button></div>
   </div>
+  <div class="road-wrap" id="road" hidden></div>
   <div class="today" id="today" hidden></div>
   <div class="mytiles" id="mytiles" hidden></div>
   <div class="exp" id="exp"><p class="sec-label">체험</p><div class="grid jm-stagger" id="expgrid"></div></div>
-  <p class="sec-label">앱</p>
+  <p class="sec-label" id="apps-label">앱</p>
   <div class="grid jm-stagger" id="grid"></div>
   <div class="foot">ⓘ를 누르면 설명이 펼쳐져요</div>
 </div>
@@ -197,6 +199,7 @@ APPS.forEach(function(a,i){ addCard(a,i,document.getElementById('grid')); });
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="hub-auth.js"></script>
 <script src="hub-today.js"></script>
+<script src="hub-road.js"></script>
 <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});</script>
 </body>
 </html>
