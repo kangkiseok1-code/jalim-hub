@@ -4,7 +4,7 @@
  *   ROAD_STORY             : 선 위 '글' 점의 위치(%)와 말풍선 문구·위치
  * 노드 위치·색·글자 자리는 roadArtHtml() 안의 N(...) 줄. 색은 오행색(var(--wood) 등). */
 var ROAD_MAIN='M100 50 C150 60 215 95 210 160 C205 225 135 230 130 290 C125 350 215 355 220 420 C225 485 190 500 185 545 C180 595 170 615 160 640';
-var ROAD_BRANCH=['M210 160 C262 152 305 150 324 122','M220 420 C262 428 295 445 298 482','M185 545 C150 542 115 546 85 558'];
+var ROAD_BRANCH=['M210 160 C262 152 305 150 324 122','M220 420 C262 428 295 445 298 482','M185 545 C150 542 115 546 85 558','M236 408 C248 404 257 398 266 392'];
 /* 이야기 점: x·y = 길 위 점의 자리(그림 360x720 기준), title = 점 옆에 보이는 이름, open:'story' = 허브의 자림 스토리텔링 읽기 화면을 연다, t = 말풍선 문구(
  = 줄바꿈).
  * 위치는 그림판에서 그려 주신 자리. 문구는 앱 첫 화면의 글을 그대로 옮겼다 — 바꿀 때는 여기만 고친다 */
@@ -31,7 +31,7 @@ function roadNode(o){
 }
 function roadTxt(x,y,label,sub,small,anchor){   // anchor: 'end'(노드 왼쪽에 붙임) | 'middle'(노드 아래) | 생략=오른쪽
   var a=anchor?' text-anchor="'+anchor+'"':'';
-  return '<text class="rd-lbl" x="'+x+'" y="'+y+'"'+a+(small?' font-size="14"':'')+'>'+label+'</text>'
+  return '<text class="rd-lbl" x="'+x+'" y="'+y+'"'+a+(small?' font-size="'+(small===2?12:14)+'"':'')+'>'+label+'</text>'
     +(sub?'<text class="rd-sub" x="'+x+'" y="'+(y+15)+'"'+a+'>'+sub+'</text>':'');
 }
 function roadArtHtml(d){
@@ -46,6 +46,7 @@ function roadArtHtml(d){
   s+=roadNode({name:'함께 걷기',href:BASE+'life-walk/together.html',x:324,y:122,r:13,c:'var(--fire)',text:roadTxt(324,152,'함께 걷기','',1,'middle')});
   s+=roadNode({name:'나의 흐름',href:A+'?go=saju',x:130,y:290,r:22,c:'var(--earth)',text:roadTxt(160,286,'나의 흐름','분석 · 사주')});
   s+=roadNode({name:'나를 더 알아보기',href:A+'?go=trait',x:220,y:420,r:22,c:'var(--metal)',text:roadTxt(190,415,'나를 더 알아보기','성향 · 기호 · 대인관계',0,'end')});
+  s+=roadNode({name:'지인이 본 나',href:A+'?go=peer',x:266,y:392,r:8,c:'var(--wood)',text:roadTxt(277,397,'지인이 본 나','',2)});
   s+=roadNode({name:'만남',href:BASE+'mating-app/',x:298,y:482,r:13,c:'var(--fire)',text:roadTxt(314,487,'만남','',1)});
   s+=roadNode({name:'운세 체크인 달력',href:BASE+'lotto-app/',x:85,y:558,r:17,c:'var(--earth)',text:roadTxt(85,592,'운세 체크인 달력',ck,0,'middle')});
   s+=roadNode({name:'심화 상담',href:BASE+'counsel-tool/',gate:1,x:160,y:640,r:26,c:'var(--water)',text:roadTxt(194,646,'심화 상담',gate)});

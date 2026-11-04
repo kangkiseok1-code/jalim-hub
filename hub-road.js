@@ -44,10 +44,9 @@ function roadMore(){
 }
 function renderRoad(){
   var box=document.getElementById('road'); if(!box) return;
-  if(!me){ box.hidden=true; box.innerHTML=''; document.body.classList.remove('in-road'); return; }
   try{
-    var d=roadData.uid===me.id?roadData:{core:false,walk:0,checkins:0,today:null,recent:[false,false,false,false,false],nick:''};
-    box.innerHTML=(typeof idleBannerHtml==='function'?idleBannerHtml():'')+'<h2 class="road-h">'+(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요</h2>'
+    var d=(me&&roadData.uid===me.id)?roadData:{core:false,walk:0,checkins:0,today:null,recent:[false,false,false,false,false],nick:''};
+    box.innerHTML=(typeof idleBannerHtml==='function'?idleBannerHtml():'')+'<h2 class="road-h">'+(me?(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요':'나를 알아가는 길')+'</h2>'
       +roadAdmin()+roadArtHtml(d)+roadMore();
     box.hidden=false; document.body.classList.add('in-road');
     var adm=document.getElementById('road-adm'); if(adm) adm.onclick=adminSheet;
