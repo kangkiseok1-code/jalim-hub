@@ -68,6 +68,7 @@ function renderRoad(){
   }catch(e){ roadFail(box,e); return; }
   box.innerHTML=html; box.hidden=false; document.body.classList.add('in-road');
   roadSafe(function(){ wireRoadStories(box); });
+  roadSafe(function(){ wireRoadTips(box); });
   roadSafe(renderAdminBtn);
   roadSafe(function(){ if(typeof wireIdleBanner==='function') wireIdleBanner(); });
 }

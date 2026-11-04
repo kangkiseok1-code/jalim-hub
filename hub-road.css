@@ -31,13 +31,11 @@
 .rd-bub{position:absolute;z-index:5;width:230px;max-width:94%;max-height:300px;overflow-y:auto;background:var(--card);border-radius:var(--r-list);padding:11px 13px;font-family:var(--serif);font-size:.86rem;line-height:1.7;white-space:pre-line;box-shadow:var(--shadow);word-break:keep-all}
 .rd-bub[hidden]{display:none}
 .rd-bub b{display:block;margin-bottom:4px;font-size:.78rem;color:var(--accent-ink)}
+.rd-tip{position:absolute;z-index:6;pointer-events:none;white-space:nowrap;padding:5px 11px;border-radius:var(--r-pill);background:var(--ink);color:var(--card);font-size:.78rem;font-weight:700;box-shadow:var(--shadow)}
+.rd-tip[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){.rd-draw{animation:none;stroke-dashoffset:0}.rd-st i::after{animation:none}}
 .warnbar{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;padding:14px 16px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:var(--r-list);font-size:.85rem;color:var(--ink)}
 .warnbar b{font-size:.95rem}
 .warnbar .btn{align-self:flex-start;margin-top:4px}
-/* 길에서 갈라지는 옆가지(운세 체크인 달력): 안쪽으로 들여 길 위의 가지처럼 */
-.ck-card.branch{margin:0 0 0 22px;position:relative}
-.ck-card.branch::before{content:"";position:absolute;left:-13px;top:50%;width:13px;border-top:2px solid var(--line-strong)}
-.ck-card .ck-t{display:block;font-size:.72rem;font-weight:700;color:var(--gold-ink);letter-spacing:.02em;margin-bottom:2px}
 /* 로그인 후에는 스토리텔링 버튼 대신 길 위의 '자림 스토리텔링' 점으로 읽는다 */
 .in-road .story-btn{display:none}

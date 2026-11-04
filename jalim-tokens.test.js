@@ -28,3 +28,18 @@ test('값이 있을 때만 저장하고 reset 하면 다시 읽는다', () => {
   vars['--x'] = '#def'; assert.strictEqual(JT.c('--x'), '#abc');
   JT.reset(); assert.strictEqual(JT.c('--x'), '#def');
 });
+test('face: 오행 면+글자를 한 번에', () => {
+  const JT = load({});
+  assert.strictEqual(JT.face('목'), 'background:var(--wood-soft);color:var(--wood-ink)');
+  assert.strictEqual(JT.face('fire'), 'background:var(--fire-soft);color:var(--fire-ink)');
+});
+test('soft: 진한 오행·먹·금색·파랑을 파스텔/초록으로, 나머지는 그대로', () => {
+  const JT = load({ '--wood': '#0e8a5f', '--ink': '#121212' });
+  assert.strictEqual(JT.soft('var(--wood)'), 'var(--wood-soft)');
+  assert.strictEqual(JT.soft('#0E8A5F'), 'var(--wood-soft)');
+  assert.strictEqual(JT.soft('var(--ink)'), 'var(--accent)');
+  assert.strictEqual(JT.soft('var(--gold)'), 'var(--accent)');
+  assert.strictEqual(JT.soft('var(--info)'), 'var(--metal-soft)');
+  assert.strictEqual(JT.soft('#abcdef'), '#abcdef');
+  assert.strictEqual(JT.soft(''), '');
+});

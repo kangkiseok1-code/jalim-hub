@@ -35,6 +35,30 @@ var ROAD_LINK={core:function(A){return A+'?go=saju'},walk:function(A,B){return B
  flow:function(A){return A+'?go=saju'},more:function(A){return A+'?go=trait'},peer:function(A){return A+'?go=peer'},mate:function(A,B){return B+'mating-app/'},
  check:function(A,B){return B+'lotto-app/'},counsel:function(A,B){return B+'counsel-tool/'}};
 
+/* 노드 설명 글자: 마우스를 올리거나, 휴대폰에서 길게 누르면 노드 위에 잠깐 나온다. 짧게 누르면 그대로 이동 */
+var ROAD_TIP={flow:'사주 분석',more:'성향, 기호, 대인관계 분석',check:'일운 재물운 기록'};
+function wireRoadTips(box){
+  var art=box.querySelector('.rd-art'); if(!art) return;
+  var tip=document.createElement('div'); tip.className='rd-tip'; tip.hidden=true; tip.setAttribute('role','tooltip'); art.appendChild(tip);
+  var timer=null, hideT=null;
+  function show(a){
+    clearTimeout(hideT); tip.textContent=a.getAttribute('data-tip'); tip.hidden=false;
+    var W=art.clientWidth, H=art.clientHeight, cx=a.getAttribute('data-x')/ROAD_W*W, top=a.getAttribute('data-y')/ROAD_H*H;
+    var w=tip.offsetWidth; tip.style.left=Math.max(4,Math.min(W-w-4,cx-w/2))+'px'; tip.style.top=Math.max(0,top-tip.offsetHeight-8)+'px';
+  }
+  function hide(){ clearTimeout(timer); tip.hidden=true; }
+  art.querySelectorAll('.rd-n[data-tip]').forEach(function(a){
+    a.addEventListener('mouseenter',function(){ show(a); }); a.addEventListener('mouseleave',hide);
+    a.addEventListener('focus',function(){ show(a); }); a.addEventListener('blur',hide);
+    a.addEventListener('pointerdown',function(e){
+      if(e.pointerType!=='touch') return;
+      a._lp=false; clearTimeout(timer); timer=setTimeout(function(){ a._lp=true; show(a); },450);
+    });
+    ['pointerup','pointercancel','pointerleave'].forEach(function(n){ a.addEventListener(n,function(){ clearTimeout(timer); if(a._lp){ hideT=setTimeout(hide,1800); } }); });
+    a.addEventListener('click',function(e){ if(a._lp){ e.preventDefault(); e.stopImmediatePropagation(); a._lp=false; } },true);   // 길게 눌러 설명을 본 경우엔 이동하지 않는다
+    a.addEventListener('contextmenu',function(e){ e.preventDefault(); });   // 휴대폰 길게 누르기 메뉴 막기
+  });
+}
 function roadGateText(){
   if(!me||!access||!access.loaded) return '';
   if(access.admin) { var n=pendingCount(); return n?'신청 '+n+'건':''; }
@@ -47,7 +71,8 @@ function roadNode(n,d,here){
   var soft='var(--'+el+'-soft)', ink=ring?(el==='fire'?'var(--fire-deep)':'var(--metal-ink)'):'var(--'+el+'-ink)';
   var fill=ring?(el==='fire'?'var(--fire-tint)':'var(--metal-tint)'):soft;
   var href=ROAD_LINK[key](ANALYSIS_URL,BASE), gate=key==='counsel'?' data-gate="counsel"':'';
-  var s='<a href="'+href+'" class="rd-n" aria-label="'+esc(name.join(' '))+'"'+gate+'>';
+  var tip=ROAD_TIP[key]||'';
+  var s='<a href="'+href+'" class="rd-n" aria-label="'+esc(name.join(' ')+(tip?' — '+tip:''))+'"'+gate+(tip?' data-tip="'+esc(tip)+'" data-x="'+x+'" data-y="'+(y-r)+'"':'')+'>';
   if(here===key) s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r+9)+'" class="rd-ring"/>';
   s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" class="rd-dot" style="fill:'+fill+(ring?';stroke:'+soft+';stroke-width:6':'')+'"/>'
     +'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="url(#rd-hi)"/>'
