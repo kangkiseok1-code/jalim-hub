@@ -74,3 +74,6 @@ async function loadApplyRecs(){
     +'<ul style="list-style:none;margin:6px 0 0;padding:0;font-size:.85rem">'+row('사주·출생 정보',core?'있음':'없음')+row('인생 다시 걷기 기록',walk+'곳')+row('성향·기호·대인 검사',tests+'종')+'</ul>'
     +'<p style="margin:6px 0 0">보내기 직전에 항목마다 직접 골라요. 고르지 않은 것은 전달되지 않아요.</p></div>';
 }
+
+/* 앱에서 브라우저 '뒤로'로 돌아오면 브라우저가 예전에 본 허브 화면을 그대로 되살리는 일이 있다 — 그럴 땐 새로 불러와 항상 지금의 지도 허브로 보이게 한다 */
+window.addEventListener('pageshow',function(e){ if(e.persisted) location.reload(); });

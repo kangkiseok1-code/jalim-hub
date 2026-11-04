@@ -43,3 +43,5 @@
 .ck-card.branch{margin:0 0 0 22px;position:relative}
 .ck-card.branch::before{content:"";position:absolute;left:-13px;top:50%;width:13px;border-top:2px solid var(--line-strong)}
 .ck-card .ck-t{display:block;font-size:.72rem;font-weight:700;color:var(--gold-ink);letter-spacing:.02em;margin-bottom:2px}
+/* 로그인 후에는 스토리텔링 버튼 대신 길 위의 '자림 스토리텔링' 점으로 읽는다 */
+.in-road .story-btn{display:none}
