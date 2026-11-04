@@ -54,7 +54,10 @@ function roadNode(n,d,here){
     +'<g transform="translate('+(x-9)+' '+(y-r*.62-4)+') scale(.75)" class="rd-ic" style="stroke:'+ink+'">'+ROAD_ICON[n[7]]+'</g>';
   name.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y+3+i*(fs+3))+'" text-anchor="middle" class="rd-nm" font-size="'+fs+'" style="fill:'+ink+'">'+esc(line)+'</text>'; });
   var cap=key==='walk'&&d.walk?d.walk+'곳 기록':key==='check'?(d.today?'오늘 기록 완료 · '+d.today.score+'점':'오늘 하루는 어땠나요?'):key==='counsel'?roadGateText():key==='core'&&d.loaded&&!d.core?'지금 입력하기':'';
-  if(cap) s+='<text x="'+x+'" y="'+(y+r+15)+'" text-anchor="middle" class="rd-cap">'+esc(cap)+'</text>';
+  if(cap){   // 글자는 노드 아래. 단 운세 체크인 달력은 아래에 길이 지나가서 노드 오른쪽 빈 곳에 둔다
+    if(key==='check') s+='<text x="'+(x+r+8)+'" y="'+(y+4)+'" class="rd-cap">'+esc(cap)+'</text>';
+    else s+='<text x="'+x+'" y="'+(y+r+15)+'" text-anchor="middle" class="rd-cap">'+esc(cap)+'</text>';
+  }
   return s+'</a>';
 }
 function roadArtHtml(d){
