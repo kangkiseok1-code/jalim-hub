@@ -1,7 +1,7 @@
-/* 허브 첫 화면의 '길' — 로그인한 사람에게 앱 목록 대신 "여기까지 왔어요 → 다음은 여기"를 한 줄로 보여 준다.
- *   사주 입력 → 인생 다시 걷기 → 분석 → 상황·기질·대인 → 심화 상담, 길 옆에 오늘 체크인.
+/* 허브 첫 화면의 '길' — 로그인한 사람에게 앱 목록 대신 "여기까지 왔어요 → 다음은 여기"를 한 폭의 그림으로 보여 준다.
+ *   사주 입력 → 인생 다시 걷기 → 나의 흐름 → 나를 더 알아보기 → (운세 체크인 달력 곁가지) → 심화 상담.
  * 읽기만 한다(내 정보 표 4개). 로그인 전 화면과 오늘의 기운 카드는 그대로 둔다.
- * 쓰는 전역: me, sb, access, esc, BASE, ANALYSIS_URL, loadBirthCandidates (hub-auth.js · hub-today.js · index.html) */
+ * 그림(길·노드·이야기 점)은 hub-road-art.js. 쓰는 전역: me, sb, access, esc, BASE, ANALYSIS_URL, loadBirthCandidates (hub-auth.js · hub-today.js · index.html) */
 var roadData={uid:null,loaded:false,core:false,nick:'',walk:0,checkins:0,today:null,recent:[]};
 var roadRun=0;
 
@@ -31,28 +31,6 @@ async function loadRoadData(){
   roadData=d; renderRoad();
 }
 
-function roadChip(label,cls){ return '<span class="jn-chip '+(cls||'')+'">'+label+'</span>'; }
-function roadNodes(d){
-  var A=ANALYSIS_URL, here=!d.loaded?'':!d.core?'core':!d.walk?'walk':'';   // 지금 할 일: 사주 입력이 먼저, 그다음 걷기
-  var cls=function(done,key){ return 'node'+(done?' is-done':'')+(here===key?' is-now':''); };
-  var n=[];
-  n.push('<div class="'+cls(d.core,'core')+'"><a class="nm" href="'+A+'?go=saju">사주 입력 '+(d.core?roadChip('완료','ok'):here==='core'?roadChip('지금','try'):'')+'</a>'
-    +(d.core?'':'<p class="ds">생년월일을 한 번 넣으면 모든 앱에서 같이 써요</p>')+'</div>');
-  n.push('<div class="'+cls(d.walk>0,'walk')+'"><a class="nm" href="'+BASE+'life-walk/">인생 다시 걷기 '+(d.walk?roadChip(d.walk+'곳 기록','ok'):here==='walk'?roadChip('지금','try'):'')+'</a>'
-    +'<p class="ds">5분 · 결과는 자동 저장돼요</p><div class="side"><a class="go" href="'+BASE+'life-walk/">'+(d.walk?'이어서 걷기':'걷기 시작')+'</a><a class="gold" href="'+BASE+'life-walk/together.html">함께 걷기 ›</a></div></div>');
-  n.push('<div class="node"><a class="nm" href="'+A+'?go=saju">나의 흐름</a><p class="ds">분석 · 사주</p></div>');
-  n.push('<div class="node"><span class="nm">나를 더 알아보기</span><p class="ds">성향 · 기호 · 대인관계</p><div class="side">'
-    +'<a href="'+A+'?go=trait">성향</a><a href="'+A+'?go=pref">기호</a><a href="'+A+'?go=ipc">대인관계</a><a class="gold" href="'+BASE+'mating-app/">만남 ›</a></div></div>');
-  n.push(roadCheckin(d));   // 길에서 갈라지는 옆가지: 운세 체크인 달력
-  n.push('<div class="node"><a class="nm" href="'+BASE+'counsel-tool/" data-gate="counsel">심화 상담 <span class="jn-chip warn" id="gate-counsel-road" hidden></span></a>'
-    +'<p class="ds">결과는 분석에 다시 반영돼요</p></div>');
-  return n.join('');
-}
-function roadCheckin(d){
-  var done=!!d.today, dots=d.recent.map(function(on){return '<i'+(on?' class="on"':'')+'></i>'}).join('');
-  return '<a class="ck-card branch jm-press" href="'+BASE+'lotto-app/"><div><span class="ck-t">운세 체크인 달력</span><b>'+(done?'오늘 기록 완료 · '+d.today.score+'점':'오늘 하루는 어땠나요?')+'</b>'
-    +'<span>'+(done?'운세 체크인 달력에서 수정할 수 있어요':'운세 체크인 달력에 10초면 남겨요')+'</span></div><div class="ck-dots" aria-hidden="true">'+dots+'</div></a>';
-}
 function roadAdmin(){
   if(!access||!access.admin||!access.loaded) return '';
   var n=pendingCount();
@@ -70,11 +48,11 @@ function renderRoad(){
   try{
     var d=roadData.uid===me.id?roadData:{core:false,walk:0,checkins:0,today:null,recent:[false,false,false,false,false],nick:''};
     box.innerHTML=(typeof idleBannerHtml==='function'?idleBannerHtml():'')+'<h2 class="road-h">'+(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요</h2>'
-      +roadAdmin()+'<div class="road">'+roadNodes(d)+'</div>'+roadMore();
+      +roadAdmin()+roadArtHtml(d)+roadMore();
     box.hidden=false; document.body.classList.add('in-road');
     var adm=document.getElementById('road-adm'); if(adm) adm.onclick=adminSheet;
+    wireRoadStories(box);
     if(typeof wireIdleBanner==='function') wireIdleBanner();
-    if(typeof renderGate==='function') renderGate();   // 심화 상담 줄의 상태 알약
   }catch(e){ box.hidden=true; box.innerHTML=''; document.body.classList.remove('in-road'); }   // 문제가 생기면 지금까지의 허브 모습으로
 }
 /* 로그인·로그아웃으로 계정이 바뀔 때 다시 읽는다 (hub-auth.js 가 refreshAccess 에서 refreshToday 를 부를 때 같이) */
