@@ -35,3 +35,7 @@
 .warnbar{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;padding:14px 16px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:var(--r-list);font-size:.85rem;color:var(--ink)}
 .warnbar b{font-size:.95rem}
 .warnbar .btn{align-self:flex-start;margin-top:4px}
+/* 길에서 갈라지는 옆가지(운세 체크인 달력): 안쪽으로 들여 길 위의 가지처럼 */
+.ck-card.branch{margin:0 0 0 22px;position:relative}
+.ck-card.branch::before{content:"";position:absolute;left:-13px;top:50%;width:13px;border-top:2px solid var(--line-strong)}
+.ck-card .ck-t{display:block;font-size:.72rem;font-weight:700;color:var(--gold-ink);letter-spacing:.02em;margin-bottom:2px}
