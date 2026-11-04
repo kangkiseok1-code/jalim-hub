@@ -3,6 +3,8 @@
 .road-wrap[hidden]{display:none}
 .road-wrap{margin:0 0 14px}
 .road-h{font-family:var(--serif);font-size:1.3rem;line-height:1.4;margin:0 0 12px;word-break:keep-all;text-wrap:balance}
+.road-err{margin:0 0 12px;padding:12px 14px;background:var(--fire-tint);color:var(--fire-deep);border-radius:var(--r-list);font-size:.88rem;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.road-err small{flex-basis:100%;opacity:.8;font-size:.75rem;overflow-wrap:anywhere}
 /* 나만의 길 그림 (hub-road-art.js) — 색은 모두 jalim-base.css 토큰 */
 .rd-art{position:relative;width:100%;aspect-ratio:330/600;margin:0 0 8px}
 .rd-art svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}

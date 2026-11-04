@@ -50,16 +50,26 @@ function adminMenuSheet(){
   document.getElementById('am-c').onclick=adminSheet;
   document.getElementById('am-t').onclick=function(){ location.href=BASE+'Team-maker/team-maker.html'; };
 }
+/* 지도를 한 번 그린 뒤에는 부가 기능(이야기 점·관리자 버튼·안내 배너)이 잘못돼도 지도를 숨기지 않는다.
+ * 지도 자체를 못 그리면 오류 문구를 보여 주고(원인 확인용), 아래에 예전 카드 목록이 남아 허브를 쓸 수 있다. */
+function roadFail(box,e){
+  try{ console.error('허브 지도 오류',e); }catch(_){}
+  document.body.classList.remove('in-road'); box.hidden=false;
+  box.innerHTML='<div class="road-err" role="alert">지도를 그리지 못했어요 <small>'+esc(String(e&&e.message||e))+'</small> <button class="btn sm" type="button" onclick="location.reload()">새로고침</button></div>';
+}
+function roadSafe(fn){ try{ fn(); }catch(e){ try{ console.error('허브 지도 부가 기능 오류',e); }catch(_){} } }
 function renderRoad(){
   var box=document.getElementById('road'); if(!box) return;
+  var html;
   try{
     var d=(me&&roadData.uid===me.id)?roadData:{core:false,walk:0,checkins:0,today:null,recent:[false,false,false,false,false],nick:''};
-    box.innerHTML=(typeof idleBannerHtml==='function'?idleBannerHtml():'')+'<h2 class="road-h">'+(me?(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요':'나를 알아가는 길')+'</h2>'
-      +roadArtHtml(d);
-    box.hidden=false; document.body.classList.add('in-road');
-    wireRoadStories(box); renderAdminBtn();
-    if(typeof wireIdleBanner==='function') wireIdleBanner();
-  }catch(e){ box.hidden=true; box.innerHTML=''; document.body.classList.remove('in-road'); }   // 문제가 생기면 지금까지의 허브 모습으로
+    html='<h2 class="road-h">'+(me?(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요':'나를 알아가는 길')+'</h2>'+roadArtHtml(d);
+    if(typeof idleBannerHtml==='function') html=idleBannerHtml()+html;
+  }catch(e){ roadFail(box,e); return; }
+  box.innerHTML=html; box.hidden=false; document.body.classList.add('in-road');
+  roadSafe(function(){ wireRoadStories(box); });
+  roadSafe(renderAdminBtn);
+  roadSafe(function(){ if(typeof wireIdleBanner==='function') wireIdleBanner(); });
 }
 /* 로그인·로그아웃으로 계정이 바뀔 때 다시 읽는다 (hub-auth.js 가 refreshAccess 에서 refreshToday 를 부를 때 같이) */
 if(typeof me!=='undefined'&&me) loadRoadData(); else renderRoad();
