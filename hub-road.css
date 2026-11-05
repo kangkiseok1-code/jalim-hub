@@ -31,7 +31,7 @@
 .rd-bub{position:absolute;z-index:5;width:230px;max-width:94%;max-height:300px;overflow-y:auto;background:var(--card);border-radius:var(--r-list);padding:11px 13px;font-family:var(--serif);font-size:.86rem;line-height:1.7;white-space:pre-line;box-shadow:var(--shadow);word-break:keep-all}
 .rd-bub[hidden]{display:none}
 .rd-bub b{display:block;margin-bottom:4px;font-size:.78rem;color:var(--accent-ink)}
-.rd-tip{position:absolute;z-index:6;pointer-events:none;white-space:nowrap;padding:5px 11px;border-radius:var(--r-pill);background:var(--ink);color:var(--card);font-size:.78rem;font-weight:700;box-shadow:var(--shadow)}
+.rd-tip{position:absolute;z-index:6;pointer-events:none;white-space:nowrap;padding:5px 11px;border-radius:var(--r-pill);background:var(--card);color:var(--wood-ink);font-size:.78rem;font-weight:700;box-shadow:var(--shadow)}
 .rd-tip[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){.rd-draw{animation:none;stroke-dashoffset:0}.rd-st i::after{animation:none}}
 .warnbar{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;padding:14px 16px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:var(--r-list);font-size:.85rem;color:var(--ink)}
