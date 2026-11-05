@@ -296,6 +296,7 @@ async function refreshAccess(){
   access.loaded=true; renderGate();
   if(typeof renderRoad==='function') renderRoad();   // 관리자 칸·팀메이커는 승인 정보가 온 뒤에 보인다
   openManageIfRequested(); openApplyIfRequested();
+  if(typeof checkCoreConsent==='function') checkCoreConsent();   // 첫 로그인 뒤 출생정보 공유 동의(hub-core.js)
 }
 function openManageIfRequested(){
   if(!MANAGE||!me) return;
