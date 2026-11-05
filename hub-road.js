@@ -63,7 +63,7 @@ function renderRoad(){
   var html;
   try{
     var d=(me&&roadData.uid===me.id)?roadData:{core:false,walk:0,checkins:0,today:null,recent:[false,false,false,false,false],nick:''};
-    html='<h2 class="road-h">'+(me?(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요':'나를 알아가는 길')+'</h2>'+roadArtHtml(d);
+    html='<h2 class="road-h">'+(me?(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요':'나를 알아가는 길')+'</h2>'+roadArtHtml(d)+(me?'<p class="rd-hint">초록 점을 누르면 이야기가 나와요</p>':'');
     if(typeof idleBannerHtml==='function') html=idleBannerHtml()+html;
   }catch(e){ roadFail(box,e); return; }
   box.innerHTML=html; box.hidden=false; document.body.classList.add('in-road');

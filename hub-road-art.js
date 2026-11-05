@@ -79,9 +79,9 @@ function roadNode(n,d,here){
   s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" class="rd-dot" style="fill:'+fill+(ring?';stroke:'+soft+';stroke-width:6':'')+'"/>'
     +'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="url(#rd-hi)"/>'
     +(desc?'':'<g transform="translate('+(x-9)+' '+(y-r*.62-4)+') scale(.75)" class="rd-ic" style="stroke:'+ink+'">'+ROAD_ICON[n[7]]+'</g>');
-  var f2=desc?11.5:fs, y0=desc?y-(name.length*(f2+3)+desc.length*10)/2+f2-1:y+3;
+  var f2=desc?11.5:fs, y0=desc?y-(name.length*(f2+3)+desc.length*12)/2+f2-1:y+3;
   name.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+i*(f2+3))+'" text-anchor="middle" class="rd-nm" font-size="'+f2+'" style="fill:'+ink+'">'+esc(line)+'</text>'; });
-  if(desc) desc.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+name.length*(f2+3)+2+i*10)+'" text-anchor="middle" class="rd-desc" style="fill:'+ink+'">'+esc(line)+'</text>'; });
+  if(desc) desc.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+name.length*(f2+3)+3+i*12)+'" text-anchor="middle" class="rd-desc" style="fill:'+ink+'">'+esc(line)+'</text>'; });
   var cap=key==='walk'&&d.walk?d.walk+'곳 기록':key==='check'?(d.today?'오늘 기록 완료 · '+d.today.score+'점':'오늘 하루는 어땠나요?'):key==='counsel'?roadGateText():key==='core'&&d.loaded&&!d.core?'지금 입력하기':'';
   if(cap){   // 글자는 노드 아래. 단 운세 체크인 달력은 아래에 길이 지나가서 노드 오른쪽 빈 곳에 둔다
     if(key==='check') s+='<text x="'+(x+r+8)+'" y="'+(y+4)+'" class="rd-cap">'+esc(cap)+'</text>';
