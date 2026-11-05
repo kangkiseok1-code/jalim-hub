@@ -12,11 +12,11 @@ var ROAD_NODES=[
  ['core','사주|입력',92,70,42,'wood','solid','compass',13],
  ['walk','인생|다시 걷기',245,150,46,'fire','ring','foot',13],
  ['together','함께|걷기',125,150,33,'fire','solid','two',11.5],
- ['flow','나의|흐름',92,240,42,'earth','solid','wave',13],
- ['more','나를 더|알아보기',170,350,46,'metal','ring','search',13],
+ ['flow','나의|흐름',92,240,48,'earth','solid','wave',13],
+ ['more','나를 더|알아보기',170,350,54,'metal','ring','search',13],
  ['peer','지인이|본 나',272,316,30,'metal','solid','people',11],
  ['mate','만남',276,396,30,'metal','solid','rings',12],
- ['check','운세 체크인|달력',80,440,42,'water','solid','cal',11.5],
+ ['check','운세 체크인|달력',80,440,50,'water','solid','cal',11.5],
  ['counsel','심화|상담',224,520,46,'water','solid','chat',13]];
 var ROAD_ICON={compass:'<circle cx="12" cy="12" r="8"/><path d="M15 9l-2 5-4 1 2-5z"/>',foot:'<ellipse cx="9" cy="8" rx="2.4" ry="3.6"/><ellipse cx="15.5" cy="14" rx="2.4" ry="3.6"/>',
  two:'<circle cx="8" cy="8" r="2.6"/><circle cx="16" cy="8" r="2.6"/><path d="M3.5 19c.6-3.4 2.4-5 4.5-5s3.9 1.6 4.5 5M11.5 19c.6-3.4 2.4-5 4.5-5s3.9 1.6 4.5 5"/>',
@@ -29,14 +29,16 @@ var ROAD_STORY=[
   {x:186,y:70,pos:'a',title:'자림 스토리텔링',open:'story'},
   {x:188,y:240,pos:'b',title:'명리치유 첫 화면',t:'사주 명리학은 길흉을 점치는 도구도, 흥망을 알아맞히는 퀴즈도 아닙니다.\n내가 어떤 사람인지 또렷이 비추어, 그에 맞는 삶을 설계하도록 돕는 나침반이라 믿습니다.\n내가 아는 나와 남이 보는 나를 마주 세워, 더 깊이 나를 들여다보는 귀한 순간이 되기를.\n— 명리치유사 자림'},
   {x:132,y:290,pos:'r',title:'만남 글귀',t:'운명이 찾아오기만을 기다리고 있나요?\n옷깃이 스칠 일조차 드문 시대, 이제 인연은 내가 먼저 알아보는 것입니다.\n명리로 나를 비추고, 성향을 더하고, 나의 데이터를 입혔습니다.\n내가 아는 나와 남이 보는 나를 지나 나에게 맞는 사람에게로.\n— 자림과 함께합니다'},
-  {x:142,y:520,pos:'b',title:'체크인 달력',t:'일확천금을 약속드릴 수는 없지만, 행복을 스스로 찾아가듯 행운도 내게 오도록 길을 낼 수는 있습니다.\n명리학으로 읽은 나의 사주로 재물이 좋은 날과 복이 드는 시기를 짚고, 내게 필요한 기운의 숫자를 골라 드립니다.\n여러 패턴과 데이터를 더해 행운을 붙잡는 작은 보탬과 소소한 즐거움이 되고자 합니다.'}
+  {x:88,y:368,pos:'a',title:'체크인 달력',t:'일확천금을 약속드릴 수는 없지만, 행복을 스스로 찾아가듯 행운도 내게 오도록 길을 낼 수는 있습니다.\n명리학으로 읽은 나의 사주로 재물이 좋은 날과 복이 드는 시기를 짚고, 내게 필요한 기운의 숫자를 골라 드립니다.\n여러 패턴과 데이터를 더해 행운을 붙잡는 작은 보탬과 소소한 즐거움이 되고자 합니다.'}
 ];
 var ROAD_LINK={core:function(A){return A+'?go=saju'},walk:function(A,B){return B+'life-walk/'},together:function(A,B){return B+'life-walk/together.html'},
  flow:function(A){return A+'?go=saju'},more:function(A){return A+'?go=trait'},peer:function(A){return A+'?go=peer'},mate:function(A,B){return B+'mating-app/'},
  check:function(A,B){return B+'lotto-app/'},counsel:function(A,B){return B+'counsel-tool/'}};
 
 /* 노드 설명 글자: 마우스를 올리거나, 휴대폰에서 길게 누르면 노드 위에 잠깐 나온다. 짧게 누르면 그대로 이동 */
-var ROAD_TIP={flow:'사주 분석',more:'성향, 기호, 대인관계 분석',check:'일운 재물운 기록'};
+var ROAD_TIP={flow:'사주 분석',more:'성향, 기호, 대인관계 분석',check:'일운 재물운 기록'};   // 접근성 이름용
+/* 원 안에 늘 보이는 설명(휴대폰에서 길게 누를 틈이 없어서) — 이 세 노드만 아이콘 대신 이름 아래 작은 글씨 */
+var ROAD_DESC={flow:['사주 분석'],more:['성향·기호','대인관계'],check:['일운·재물운','기록']};
 function wireRoadTips(box){
   var art=box.querySelector('.rd-art'); if(!art) return;
   var tip=document.createElement('div'); tip.className='rd-tip'; tip.hidden=true; tip.setAttribute('role','tooltip'); art.appendChild(tip);
@@ -71,13 +73,15 @@ function roadNode(n,d,here){
   var soft='var(--'+el+'-soft)', ink=ring?(el==='fire'?'var(--fire-deep)':'var(--metal-ink)'):'var(--'+el+'-ink)';
   var fill=ring?(el==='fire'?'var(--fire-tint)':'var(--metal-tint)'):soft;
   var href=ROAD_LINK[key](ANALYSIS_URL,BASE), gate=key==='counsel'?' data-gate="counsel"':'';
-  var tip=ROAD_TIP[key]||'';
-  var s='<a href="'+href+'" class="rd-n" aria-label="'+esc(name.join(' ')+(tip?' — '+tip:''))+'"'+gate+(tip?' data-tip="'+esc(tip)+'" data-x="'+x+'" data-y="'+(y-r)+'"':'')+'>';
+  var tip=ROAD_TIP[key]||'', desc=ROAD_DESC[key];
+  var s='<a href="'+href+'" class="rd-n" aria-label="'+esc(name.join(' ')+(tip?' — '+tip:''))+'"'+gate+''+'>';
   if(here===key) s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r+9)+'" class="rd-ring"/>';
   s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" class="rd-dot" style="fill:'+fill+(ring?';stroke:'+soft+';stroke-width:6':'')+'"/>'
     +'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="url(#rd-hi)"/>'
-    +'<g transform="translate('+(x-9)+' '+(y-r*.62-4)+') scale(.75)" class="rd-ic" style="stroke:'+ink+'">'+ROAD_ICON[n[7]]+'</g>';
-  name.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y+3+i*(fs+3))+'" text-anchor="middle" class="rd-nm" font-size="'+fs+'" style="fill:'+ink+'">'+esc(line)+'</text>'; });
+    +(desc?'':'<g transform="translate('+(x-9)+' '+(y-r*.62-4)+') scale(.75)" class="rd-ic" style="stroke:'+ink+'">'+ROAD_ICON[n[7]]+'</g>');
+  var f2=desc?11.5:fs, y0=desc?y-(name.length*(f2+3)+desc.length*10)/2+f2-1:y+3;
+  name.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+i*(f2+3))+'" text-anchor="middle" class="rd-nm" font-size="'+f2+'" style="fill:'+ink+'">'+esc(line)+'</text>'; });
+  if(desc) desc.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+name.length*(f2+3)+2+i*10)+'" text-anchor="middle" class="rd-desc" style="fill:'+ink+'">'+esc(line)+'</text>'; });
   var cap=key==='walk'&&d.walk?d.walk+'곳 기록':key==='check'?(d.today?'오늘 기록 완료 · '+d.today.score+'점':'오늘 하루는 어땠나요?'):key==='counsel'?roadGateText():key==='core'&&d.loaded&&!d.core?'지금 입력하기':'';
   if(cap){   // 글자는 노드 아래. 단 운세 체크인 달력은 아래에 길이 지나가서 노드 오른쪽 빈 곳에 둔다
     if(key==='check') s+='<text x="'+(x+r+8)+'" y="'+(y+4)+'" class="rd-cap">'+esc(cap)+'</text>';
