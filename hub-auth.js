@@ -18,6 +18,7 @@ function safeNext(raw){
 }
 /* 카카오 등 외부 로그인에서 방금 돌아왔는지(주소에 인증 정보가 붙어 있음) — supabase가 주소를 지우기 전에 기록 */
 var FRESH_LOGIN=/[?&]code=|access_token=/.test(location.search+location.hash);
+var RECOVERY=/type=recovery/.test(location.hash)||new URLSearchParams(location.search).get('reset')==='1';   // 비밀번호 재설정 메일 링크로 돌아옴
 var NEXT=safeNext(new URLSearchParams(location.search).get('next'));
 /* ?manage=counsel : 관리자가 심화상담 신청 관리 화면을 바로 열고 싶을 때(심화상담 홈의 "승인 대기" 줄에서 옴) */
 var MANAGE=new URLSearchParams(location.search).get('manage')==='counsel';
@@ -62,6 +63,7 @@ function loginSheet(){
    +'<div class="or"><span>또는 이메일로</span></div>'
    +'<label>이메일</label><input type="email" id="em" placeholder="you@example.com" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false">'
    +'<label>비밀번호 <span class="opt">(6자 이상)</span></label><input type="password" id="pw" placeholder="••••••" autocomplete="'+(su?'new-password':'current-password')+'">'
+   +(su?'':'<p class="sub" style="text-align:right;margin:6px 0 0"><span class="switch" id="fg" role="button" tabindex="0">비밀번호를 잊으셨나요?</span></p>')
    +(su?'<label>비밀번호 확인</label><input type="password" id="pw2" placeholder="한 번 더 입력" autocomplete="new-password">':'')
    +'<div id="st" class="status" role="status"></div>'
    +'<button class="btn" id="go" type="button" style="width:100%;margin-top:6px">'+(su?'가입하고 시작하기':'로그인')+'</button>'
@@ -69,7 +71,46 @@ function loginSheet(){
   $('kk').onclick=doKakao;
   $('go').onclick=su?doSignup:doLogin;
   $('sw').onclick=function(){authMode=su?'login':'signup';loginSheet()};
+  if($('fg')) $('fg').onclick=function(){resetSheet($('em').value)};
   $(su?'pw2':'pw').onkeydown=function(e){if(e.key==='Enter')$('go').click()};
+}
+/* 비밀번호 재설정: 메일 받기 → 메일 링크로 돌아오면 새 비밀번호 입력 */
+function resetSheet(email0){
+  openSheet('<h2 style="margin-bottom:4px">비밀번호 재설정</h2>'
+   +'<p class="sub" style="margin:0 0 12px">가입한 이메일을 적으면 재설정 링크를 보내 드려요.</p>'
+   +'<label>이메일</label><input type="email" id="em" value="'+esc(normEmail(email0))+'" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false">'
+   +'<div id="st" class="status" role="status"></div>'
+   +'<button class="btn" id="go" type="button" style="width:100%;margin-top:6px">재설정 메일 보내기</button>'
+   +'<p class="sub" style="text-align:center;margin:14px 0 0"><span class="switch" id="sw" role="button" tabindex="0">‹ 로그인으로</span></p>');
+  $('sw').onclick=function(){authMode='login';loginSheet()};
+  $('go').onclick=async function(){
+    var email=normEmail($('em').value);
+    if(!EMAIL_RE.test(email)){status('이메일 형식을 확인해주세요 (예: name@example.com)','err');return}
+    if(!sb){status('연결할 수 없어요. 잠시 뒤 다시 시도해주세요','err');return}
+    $('go').disabled=true; status('보내는 중…');
+    var r=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname+'?reset=1'});
+    $('go').disabled=false;
+    if(r.error){status('보내지 못했어요: '+r.error.message,'err');return}
+    status('가입된 이메일이면 재설정 메일을 보냈어요. 메일이 안 보이면 스팸함도 확인해 주세요. (카카오로 가입했다면 이메일 로그인이 아니라 카카오 로그인을 쓰세요)','ok');
+  };
+}
+function newPwSheet(){
+  openSheet('<h2 style="margin-bottom:4px">새 비밀번호</h2>'
+   +'<p class="sub" style="margin:0 0 12px">앞으로 쓸 비밀번호를 정해 주세요.</p>'
+   +'<label>새 비밀번호 <span class="opt">(6자 이상)</span></label><input type="password" id="pw" autocomplete="new-password">'
+   +'<label>비밀번호 확인</label><input type="password" id="pw2" autocomplete="new-password">'
+   +'<div id="st" class="status" role="status"></div>'
+   +'<button class="btn" id="go" type="button" style="width:100%;margin-top:6px">비밀번호 바꾸기</button>');
+  $('go').onclick=async function(){
+    var p=$('pw').value;
+    if(p.length<6){status('6자 이상 입력하세요','err');return}
+    if(p!==$('pw2').value){status('비밀번호가 일치하지 않습니다. 확인란을 다시 입력해주세요','err');return}
+    $('go').disabled=true; status('바꾸는 중…');
+    var r=await sb.auth.updateUser({password:p});
+    if(r.error){status('바꾸지 못했어요: '+r.error.message,'err');$('go').disabled=false;return}
+    try{ history.replaceState(null,'',location.pathname); }catch(e){}
+    showDone('비밀번호를 바꿨어요',closeDoneSheet);
+  };
 }
 /* 로그인 성공 표시: 체크가 그려진 뒤 0.7초 있다가 이동·닫기. 움직임 줄이기면 바로 진행 */
 function showDone(msg,after){
@@ -100,7 +141,7 @@ async function doLogin(){
   if(!sb){status('연결할 수 없어요. 잠시 뒤 다시 시도해주세요','err');return}
   status('로그인 중…');
   var r=await sb.auth.signInWithPassword({email:email,password:password});
-  if(r.error){status('로그인 실패: '+r.error.message,'err');return}
+  if(r.error){status(/Invalid login/i.test(r.error.message)?'이메일 또는 비밀번호가 맞지 않아요. 가입 전이라면 회원가입을, 비밀번호가 기억나지 않으면 "비밀번호를 잊으셨나요?"를 눌러 주세요.':'로그인 실패: '+r.error.message,'err');return}
   me=r.data.user;renderAccountChip();afterAuth();
 }
 async function doSignup(){
@@ -112,6 +153,7 @@ async function doSignup(){
   status('가입 중…');
   var r=await sb.auth.signUp({email:email,password:password});
   if(r.error){status('가입 실패: '+r.error.message,'err');return}
+  if(r.data&&r.data.user&&r.data.user.identities&&!r.data.user.identities.length){status('이미 가입된 이메일이에요. 로그인하거나, 비밀번호가 기억나지 않으면 로그인 화면의 "비밀번호를 잊으셨나요?"를 눌러 주세요.','err');return}
   if(r.data.session){me=r.data.session.user;renderAccountChip();afterAuth()}
   else status('확인 메일을 보냈어요. 메일의 링크를 누른 뒤 로그인하세요.','ok');
 }
@@ -347,6 +389,7 @@ document.addEventListener('click',onGateClick,true);   // 카드 링크보다 �
   var r=await sb.auth.getSession();
   me=(r.data&&r.data.session)?r.data.session.user:null;
   renderAccountChip();
+  if(me&&RECOVERY){newPwSheet();return}
   if(me&&FRESH_LOGIN){showDone('로그인됐어요',function(){if(NEXT)location.replace(NEXT);else closeDoneSheet()});return}   // 카카오 등에서 방금 돌아옴
   if(me&&NEXT){location.replace(NEXT);return}
   if(!me&&(NEXT||MANAGE||APPLY)){authMode='login';loginSheet()}
