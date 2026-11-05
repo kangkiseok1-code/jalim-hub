@@ -38,7 +38,8 @@ function openSheet(html){
   scrimEl=document.createElement('div');scrimEl.className='jn-scrim';
   sheetEl=document.createElement('div');sheetEl.className='jn-sheet';
   sheetEl.setAttribute('role','dialog');sheetEl.setAttribute('aria-modal','true');
-  sheetEl.innerHTML=html;
+  sheetEl.innerHTML='<button type="button" class="jn-x" aria-label="닫기">✕</button>'+html;
+  sheetEl.firstChild.onclick=function(){closeSheet()};
   document.body.append(scrimEl,sheetEl);
   scrimEl.onclick=function(){closeSheet()};
 }
@@ -137,13 +138,11 @@ function accountSheet(){
    +'<div style="margin:10px 0 0"><span class="jn-chip ok">'+esc(providerLabel(u)||'로그인됨')+' 로그인 중</span>'+accessChipHtml()+'</div>'
    +'<div id="shared"></div>'
    +'<div class="jn-list">'
-   +(access.admin?'<button class="jn-row" id="adm" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="jn-main">심화상담 신청 관리<span class="jn-s">승인·거절</span></span>'+(pendingCount()?'<span class="jn-badge">'+pendingCount()+'</span>':'')+'</button>':'')
    +'<button class="jn-row" id="lo" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg><span class="jn-main">로그아웃</span></button>'
    +'<button class="jn-row quiet" id="lv" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13"/></svg><span class="jn-main">회원 탈퇴<span class="jn-s">모든 앱의 계정과 기록이 영구 삭제돼요</span></span></button>'
    +'</div>');
   $('lo').onclick=doLogout;
   $('lv').onclick=confirmLeave;
-  if($('adm')) $('adm').onclick=adminSheet;
   loadShared();
 }
 
