@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>카카오 알림 연결 · 자림</title>
+<link rel="stylesheet" href="jalim-base.css">
+<style>
+.kn{max-width:420px;margin:0 auto;padding:40px 16px}
+.kn h1{font-size:1.2rem;margin:0 0 10px}
+.kn p{color:var(--sub);line-height:1.6;margin:0 0 16px}
+.kn .btn{display:block;text-align:center;text-decoration:none}
+</style>
+</head>
+<body>
+<main class="kn">
+  <h1 id="t">연결하는 중…</h1>
+  <p id="m">카카오에서 돌아왔어요. 잠시만 기다려 주세요.</p>
+  <a class="btn" id="back" href="./" hidden>허브로 돌아가기</a>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async function(){
+  var SB_URL='https://vdnbnuxhjhckzrryvezl.supabase.co';
+  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkbmJudXhoamhja3pycnl2ZXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjkwNDUsImV4cCI6MjA5ODc0NTA0NX0.Z7HP_cmPkgxXAEjWoqk4fxLB-6Q7-tJrT8g50uTfKhE';
+  var $=function(i){return document.getElementById(i)};
+  function done(t,m){ $('t').textContent=t; $('m').textContent=m; $('back').hidden=false; }
+  try{
+    var q=new URLSearchParams(location.search), code=q.get('code');
+    try{ history.replaceState(null,'',location.pathname); }catch(e){}   // 코드를 주소창에 남기지 않는다
+    if(!code){ done('연결하지 못했어요', q.get('error_description')||'카카오에서 동의가 취소됐거나 코드가 없어요. 허브 관리 화면에서 다시 시도해 주세요.'); return; }
+    var sb=window.supabase.createClient(SB_URL,SB_KEY), s=await sb.auth.getSession();
+    if(!s.data.session){ done('로그인이 필요해요','허브에서 관리자 계정으로 로그인한 뒤 다시 연결해 주세요.'); return; }
+    var r=await sb.functions.invoke('kakao-notify',{body:{action:'connect',code:code}});
+    if(r.error||!r.data||!r.data.ok){ done('연결하지 못했어요','관리자 계정이 맞는지, 카카오 설정(동의 항목·Redirect URI)이 맞는지 확인해 주세요.'); return; }
+    done('연결됐어요','이제 상담 신청이 들어오면 카카오톡 나와의 채팅으로 알려 드려요. 허브 관리 화면에서 테스트 메시지를 보낼 수 있어요.');
+  }catch(e){ done('연결하지 못했어요','잠시 뒤 다시 시도해 주세요.'); }
+})();
+</script>
+</body>
+</html>

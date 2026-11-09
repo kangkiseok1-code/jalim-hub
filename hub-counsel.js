@@ -64,6 +64,7 @@ function counselForm(again){
     $('req').disabled=true; status('신청 중…');
     var r=await sb.rpc('request_counsel',{p_consent_version:CONSENT_VER,p_phone:PhoneCheck.clean($('cf-ph').value),p_call_time:$('cf-tm').value});
     if(r.error){status('신청하지 못했어요: '+r.error.message,'err');$('req').disabled=false;return}
+    try{ sb.functions.invoke('kakao-notify',{body:{action:'applied'}}).catch(function(){}); }catch(e){}   // 관리자 카톡 알림(실패해도 신청엔 영향 없음)
     await refreshAccess(); closeSheet(); toast('신청했어요. 승인되면 연락드릴게요');
   };
 }
@@ -82,8 +83,10 @@ function adminSheet(){
   }).join('');
   openSheet('<h2 style="margin-bottom:4px">심화상담 신청 관리</h2>'
    +'<p class="sub" style="margin:0 0 10px">대기 중인 신청이 위에 나와요.</p>'
+   +'<div id="kk-box" class="consent" style="margin-bottom:10px"><span class="sub">카카오 알림 확인 중…</span></div>'
    +'<div id="st" class="status" role="status"></div>'
    +(rows||'<p class="sub">아직 신청이 없어요.</p>'));
+  kakaoBox();
   sheetEl.querySelectorAll('[data-act]').forEach(function(b){ b.onclick=async function(){
     var act=b.getAttribute('data-act'); b.disabled=true; status('처리 중…');
     var r=await sb.rpc('decide_app_access',{p_user:b.getAttribute('data-uid'),p_app:'counsel',p_status:act});
@@ -96,4 +99,21 @@ function adminSheet(){
     if(r.error){status('삭제하지 못했어요: '+r.error.message,'err');b.disabled=false;return}
     await refreshAccess(); adminSheet(); toast('번호를 삭제했어요');
   }; });
+}
+/* 관리자 카카오 알림 상태 — 연결 여부·마지막 발송, 연결/테스트 버튼 */
+async function kakaoBox(){
+  var box=$('kk-box'); if(!box) return;
+  var r=await sb.functions.invoke('kakao-notify',{body:{action:'status'}}).catch(function(){return {}});
+  box=$('kk-box'); if(!box) return;
+  var d=r&&r.data;
+  if(!d||d.error){ box.innerHTML='<b>카카오 알림</b><p>아직 켜지지 않았어요.</p>'; return; }
+  var when=d.last_ok_at?new Date(d.last_ok_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
+  var line=!d.connected?'연결되지 않았어요.':d.last_error?'마지막 발송이 실패했어요. 다시 연결해 주세요.':(when?'연결됨 · 마지막 발송 '+when:'연결됨 · 아직 발송 기록이 없어요');
+  box.innerHTML='<b>카카오 알림</b><p>'+esc(line)+'</p>'
+    +'<div style="display:flex;gap:8px;margin-top:8px"><a class="btn sm ghost" href="'+esc(d.authorize_url||'#')+'" style="text-decoration:none">'+(d.connected?'다시 연결':'카카오 연결')+'</a>'
+    +(d.connected?'<button class="btn sm ghost" id="kk-test" type="button">테스트 보내기</button>':'')+'</div>';
+  if($('kk-test')) $('kk-test').onclick=async function(){
+    this.disabled=true; var t=await sb.functions.invoke('kakao-notify',{body:{action:'test'}}).catch(function(){return {}});
+    toast(t.data&&t.data.ok?'테스트 메시지를 보냈어요. 카톡을 확인해 보세요':'보내지 못했어요. 다시 연결해 보세요'); kakaoBox();
+  };
 }
