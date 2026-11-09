@@ -75,22 +75,5 @@ function renderRoad(){
 /* 로그인·로그아웃으로 계정이 바뀔 때 다시 읽는다 (hub-auth.js 가 refreshAccess 에서 refreshToday 를 부를 때 같이) */
 if(typeof me!=='undefined'&&me) loadRoadData(); else renderRoad();
 
-/* 심화상담 신청 화면: 지금 저장돼 있어서 상담을 보낼 때 고를 수 있는 내 기록. 읽기만 하며, 동의 문구는 건드리지 않는다 */
-async function loadApplyRecs(){
-  var box=document.getElementById('apply-recs'); if(!box||!sb||!me) return;
-  var uid=me.id, row=function(label,v){ return '<li style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-top:1px solid var(--line)"><span>'+label+'</span><b>'+v+'</b></li>'; };
-  var core=0,walk=0,tests=0;
-  try{ core=(await loadBirthCandidates()).length?1:0; }catch(e){}
-  try{ var w=await sb.from('journey_answers').select('year',{count:'exact',head:true}).eq('user_id',uid); walk=w.count||0; }catch(e){}
-  try{
-    var q=await sb.from('profiles').select('profile,prefs,ipc').eq('id',uid).maybeSingle(), p=q.data||{};
-    tests=(Array.isArray(p.profile)&&p.profile.some(Boolean)?1:0)+(Array.isArray(p.ipc)&&p.ipc.some(Boolean)?1:0)+(p.prefs&&typeof p.prefs==='object'&&Object.keys(p.prefs).length?1:0);
-  }catch(e){}
-  box=document.getElementById('apply-recs'); if(!box||!me||me.id!==uid) return;
-  box.innerHTML='<div class="consent" style="margin:0 0 10px"><b>상담을 보낼 때 고를 수 있는 내 기록</b>'
-    +'<ul style="list-style:none;margin:6px 0 0;padding:0;font-size:.85rem">'+row('사주·출생 정보',core?'있음':'없음')+row('인생 다시 걷기 기록',walk+'곳')+row('성향·기호·대인 검사',tests+'종')+'</ul>'
-    +'<p style="margin:6px 0 0">보내기 직전에 항목마다 직접 골라요. 고르지 않은 것은 전달되지 않아요.</p></div>';
-}
-
 /* 앱에서 브라우저 '뒤로'로 돌아오면 브라우저가 예전에 본 허브 화면을 그대로 되살리는 일이 있다 — 그럴 땐 새로 불러와 항상 지금의 지도 허브로 보이게 한다 */
 window.addEventListener('pageshow',function(e){ if(e.persisted) location.reload(); });
