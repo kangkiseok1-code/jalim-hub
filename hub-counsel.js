@@ -109,9 +109,13 @@ async function kakaoBox(){
   if(!d||d.error){ box.innerHTML='<b>카카오 알림</b><p>아직 켜지지 않았어요.</p>'; return; }
   var when=d.last_ok_at?new Date(d.last_ok_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
   var line=!d.connected?'연결되지 않았어요.':d.last_error?'마지막 발송이 실패했어요. 다시 연결해 주세요.':(when?'연결됨 · 마지막 발송 '+when:'연결됨 · 아직 발송 기록이 없어요');
-  box.innerHTML='<b>카카오 알림</b><p>'+esc(line)+'</p>'
-    +'<div style="display:flex;gap:8px;margin-top:8px"><a class="btn sm ghost" href="'+esc(d.authorize_url||'#')+'" style="text-decoration:none">'+(d.connected?'다시 연결':'카카오 연결')+'</a>'
-    +(d.connected?'<button class="btn sm ghost" id="kk-test" type="button">테스트 보내기</button>':'')+'</div>';
+  var who=(d.recipients||[]).map(function(x){ return esc(x.name)+(x.mine?'(나)':'')+(x.error?' ⚠':''); }).join(', ');
+  box.innerHTML='<b>카카오 알림</b><p>'+esc(line)+'</p>'+(who?'<p>받는 사람: '+who+'</p>':'')
+    +'<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><a class="btn sm ghost" href="'+esc(d.authorize_url||'#')+'" style="text-decoration:none">'+(d.connected?'다시 연결':'카카오 연결')+'</a>'
+    +(d.connected?'<button class="btn sm ghost" id="kk-test" type="button">테스트 보내기</button><button class="btn sm ghost" id="kk-off" type="button">내 연결 해제</button>':'')+'</div>';
+  if($('kk-off')) $('kk-off').onclick=async function(){
+    this.disabled=true; await sb.functions.invoke('kakao-notify',{body:{action:'disconnect'}}).catch(function(){}); toast('내 카카오 연결을 해제했어요'); kakaoBox();
+  };
   if($('kk-test')) $('kk-test').onclick=async function(){
     this.disabled=true; var t=await sb.functions.invoke('kakao-notify',{body:{action:'test'}}).catch(function(){return {}});
     toast(t.data&&t.data.ok?'테스트 메시지를 보냈어요. 카톡을 확인해 보세요':'보내지 못했어요. 다시 연결해 보세요'); kakaoBox();
