@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#fbf7ef">
-<title>자림</title>
+<title>자림 커뮤니티</title>
 <meta name="description" content="사주로 나를 알아가는 시간. 인생 다시 걷기·기운 체크인 체험과 분석·만남·심화상담·재물운 달력 앱을 한곳에서.">
 <meta property="og:title" content="자림 · 나를 알아가는 시간">
 <meta property="og:description" content="사주로 나를 알아가는 시간. 체험 3가지와 앱 5개를 한곳에서.">
@@ -18,8 +18,9 @@
 <link rel="stylesheet" href="hub-road.css">
 <style>
 #app{max-width:640px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 18px max(60px,env(safe-area-inset-bottom))}
-.head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.title{font-family:var(--serif);font-size:2.4rem;font-weight:700;letter-spacing:.14em;margin:8px 0 0;color:var(--ink)}
+.head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:4px 12px}   /* 제목이 길어져도 버튼이 좁게 눌리지 않게: 안 들어가면 버튼 줄이 아래로 */
+.head-acts{margin-left:auto}
+.title{font-family:var(--serif);font-size:1.6rem;font-weight:700;letter-spacing:.06em;margin:8px 0 0;color:var(--ink);word-break:keep-all}
 .title-sub{font-size:1rem;color:var(--sub);margin:2px 0 20px;font-weight:600;letter-spacing:.02em}
 .head-acts{display:flex;align-items:center;gap:8px;flex:none;margin-top:10px}
 #hshare{white-space:nowrap}
@@ -105,7 +106,7 @@
 <div id="app">
   <div class="head">
     <div>
-      <h1 class="title">자림</h1>
+      <h1 class="title">자림 커뮤니티</h1>
       <p class="title-sub">나를 알아가는 시간</p>
       <button id="story-open" class="story-btn" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 015.5 4H11v15H5.5A1.5 1.5 0 014 17.5z"/><path d="M20 5.5A1.5 1.5 0 0018.5 4H13v15h5.5a1.5 1.5 0 001.5-1.5z"/></svg>자림 커뮤니티 스토리텔링</button>
     </div>
