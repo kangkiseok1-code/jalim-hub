@@ -100,7 +100,7 @@ function roadArtHtml(d){
    +ROAD_BRANCH.map(function(p){return '<path pathLength="1" class="rd-draw rd-d3" stroke-width="12" d="'+p+'"/>';}).join('')+'</g>'
    +'<g filter="url(#rd-soft)">'+ROAD_NODES.map(function(n){return roadNode(n,d,here)}).join('')+'</g></svg>';
   var dots=ROAD_STORY.map(function(p,i){
-    return '<button class="rd-st" type="button" style="left:'+(p.x/ROAD_W*100).toFixed(1)+'%;top:'+(p.y/ROAD_H*100).toFixed(1)+'%" aria-expanded="false" data-i="'+i+'"'+(p.open?'':' aria-controls="rd-b'+i+'"')+'><i></i><span class="rd-t-'+p.pos+'">'+esc(p.title)+'</span></button>';
+    return '<button class="rd-st" type="button" style="left:'+(p.x/ROAD_W*100).toFixed(1)+'%;top:'+(p.y/ROAD_H*100).toFixed(1)+'%" aria-label="'+esc(p.title)+'" aria-expanded="false" data-i="'+i+'"'+(p.open?'':' aria-controls="rd-b'+i+'"')+'><i></i>'+(p.open?'<span class="rd-t-'+p.pos+'">'+esc(p.title)+'</span>':'')+'</button>';   // 글자 이름표는 '자림 스토리텔링'만 보이고, 나머지 점은 눌렀을 때 말풍선 제목으로 알린다(스크린리더용 이름은 유지)
   }).join('');
   var bubs=ROAD_STORY.map(function(p,i){
     return p.open?'':'<div class="rd-bub" id="rd-b'+i+'" hidden role="note"><b>'+esc(p.title)+'</b>'+esc(p.t)+'</div>';
