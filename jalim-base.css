@@ -218,6 +218,7 @@ body.jn-on .jn-tabbar{position:fixed;left:16px;right:16px;bottom:calc(10px + env
   --shadow-sm:0 3px 10px rgba(120,96,60,.12);
   --shadow-in:inset 0 3px 6px rgba(255,255,255,.55),inset 0 -4px 8px rgba(0,0,0,.08);
   --shadow-ink:rgba(120,96,60,.22);   /* 그림자 색(SVG 필터용) */
+  --turtle-skin:#dcd8e6; --turtle-shell:#3e3a35; --turtle-ring:#eaa74e; --turtle-belly:#f2dca8; --turtle-belly-line:#d8b672; --turtle-lip:#eaa9b2;   /* 허브 기분 아이콘(알거북) */
   --peer:#2a7d7d; --purple:#7b5cc4; --gold-line:#b08d34; --ok-tint:#f4fbf4;
   --peer-tint:#eef6f5; --peer-ink:#1f5f5f; --danger-line:#e6c9c4;
   /* 데이터 색: 지도 분류·십이운성·막대처럼 '종류 구분'에 쓰는 색. 값을 바꾸면 앱 전체가 따라간다 */

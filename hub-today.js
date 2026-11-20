@@ -24,7 +24,7 @@ var TODAY_BY_GROUP={
   관성:{t:'다잡는 날', line:'긴장이 있는 날. 무리하지 말고 나만의 페이스를 지켜보세요.'},
   인성:{t:'채우는 날', line:'기운을 채워주는 날. 배우고 쉬어가기 좋은 하루예요.'}
 };
-var TODAY_ELEM={목:{h:'木',c:'var(--wood)',k:'초록빛'},화:{h:'火',c:'var(--fire)',k:'붉은빛'},토:{h:'土',c:'var(--earth)',k:'노란빛'},금:{h:'金',c:'var(--metal)',k:'흰빛'},수:{h:'水',c:'var(--water)',k:'검은빛'}};
+var TODAY_ELEM={목:{h:'木',c:'wood',k:'초록빛'},화:{h:'火',c:'fire',k:'붉은빛'},토:{h:'土',c:'earth',k:'노란빛'},금:{h:'金',c:'metal',k:'흰빛'},수:{h:'水',c:'water',k:'검은빛'}};   // c = 토큰 이름(--c-soft 면 · --c-ink 글자, 지도 말풍선과 같은 톤)
 function todayFortune(E,p){
   var hasHour=!p.time_unknown&&p.birth_h!=null;
   var s=E.saju.computeSaju(p.birth_y,p.birth_mo,p.birth_d,hasHour?p.birth_h:'',{minute:p.birth_min||0,calendar:p.calendar||'solar',leap:!!p.leap,city:p.birth_city||undefined});
@@ -41,14 +41,14 @@ function todayFortune(E,p){
   return {elem:elem,title:d.t,line:d.line,date:(now.getMonth()+1)+'월 '+now.getDate()+'일 · '+'일월화수목금토'.charAt(now.getDay())+'요일'};
 }
 var ANALYSIS_URL=ORIGIN+'/analysis-app/';
+/* 오늘 띠(한 줄): [일진 표시 + 오늘의 날 → 누르면 내 사주 분석] [기록하기 / 고른 기분]. 출생정보가 없으면 일진 없이 기록만 */
 function todayCardHtml(f,nick){
-  var e=TODAY_ELEM[f.elem];
-  return '<a class="today-in jm-press" href="'+ANALYSIS_URL+'?go=saju" aria-label="내 사주 분석 보기">'
-    +'<div class="today-mark" style="background:'+e.c+'" aria-hidden="true">'+e.h+'</div>'
-    +'<div class="today-txt"><span class="today-date">'+esc(f.date)+'</span>'
-    +'<b>'+(nick?esc(nick)+'님, ':'')+'오늘은 '+e.h+'의 날이에요</b>'
-    +'<span class="today-line">'+esc(f.title)+' · '+esc(f.line)+'</span>'
-    +'<span class="today-lucky">행운색 '+e.k+'</span></div></a>';
+  var e=f&&TODAY_ELEM[f.elem];
+  var head=e?'<a class="ts-link jm-press" href="'+ANALYSIS_URL+'?go=saju" aria-label="'+(nick?esc(nick)+'님, ':'')+'오늘은 '+e.h+' '+esc(f.title)+' · '+esc(f.line)+' 내 사주 분석 보기">'
+      +'<span class="today-mark" style="background:var(--'+e.c+'-soft);color:var(--'+e.c+'-ink)" aria-hidden="true"><span>'+e.h+'</span></span>'
+      +'<span class="ts-t"><b>'+e.h+' '+esc(f.title)+'</b><span id="ts-line">'+ckLine()+'</span></span></a>'
+    :'<div class="ts-link"><span class="ts-t"><b>'+(nick?esc(nick)+'님, ':'')+'오늘 하루</b><span id="ts-line">'+ckLine()+'</span></span></div>';
+  return '<div class="ts">'+head+ckButton()+'</div>';
 }
 /* 나의 분석 바로가기 — 검사했는지는 허브가 모른다. 눌러서 만남의 그 탭으로 가면 거기서 결과 또는 '검사하기'가 나온다 */
 var MY_TILES=[
@@ -76,26 +76,27 @@ async function loadBirthCandidates(){
   var r=await Promise.all([readBirth('core_profiles','user_id'),readBirth('profiles','id')]);
   return r.filter(Boolean);
 }
-/* 로그인한 사람의 프로필을 읽어 카드를 그린다. 로그인 전·생년월일 없음·불러오기 실패는 카드 없이(지금 모습 그대로) */
+/* 로그인한 사람의 오늘 띠를 그린다. 로그인 전은 띠 없음, 출생정보가 없거나 엔진을 못 받으면 일진 없이 기록만 */
 async function refreshToday(){
   var box=document.getElementById('today'); if(!box) return;
   var run=++todayRun;
   renderMyTiles();
   box.hidden=true; box.innerHTML='';
   if(!sb||!me) return;
+  box.hidden=false; box.className='today jn-skel'; box.setAttribute('aria-busy','true');   // 엔진·기록을 받는 동안 자리만 잡아 둔다
+  var f=null, p=null, cands=[];
   try{
-    var cands=await loadBirthCandidates(); if(run!==todayRun||!cands.length) return;
-    box.hidden=false; box.className='today jn-skel'; box.setAttribute('aria-busy','true');   // 엔진을 받는 동안 자리만 잡아 둔다
-    var E=await loadTodayEngine(); if(run!==todayRun) return;
-    var f=null, p=null;
-    for(var i=0;i<cands.length&&!f;i++){   // 공용 정보로 계산이 안 되면(범위 밖 날짜 등) 만남 프로필로 이어간다
-      try{ f=todayFortune(E,cands[i]); if(f) p=cands[i]; }catch(e){ f=null; }
+    var got=await Promise.all([loadBirthCandidates(),loadCheckinToday()]); cands=got[0]; if(run!==todayRun) return;
+    if(cands.length){
+      var E=await loadTodayEngine(); if(run!==todayRun) return;
+      for(var i=0;i<cands.length&&!f;i++){   // 공용 정보로 계산이 안 되면(범위 밖 날짜 등) 만남 프로필로 이어간다
+        try{ f=todayFortune(E,cands[i]); if(f) p=cands[i]; }catch(e){ f=null; }
+      }
     }
-    if(run!==todayRun) return;
-    if(!f){ box.hidden=true; box.className=''; return; }
-    var nick=p.nickname||(cands.filter(function(c){return c.nickname})[0]||{}).nickname;   // 별칭이 비어 있으면 다른 쪽 별칭
-    box.className='today jm-rise'; box.removeAttribute('aria-busy'); box.innerHTML=todayCardHtml(f,nick);
-  }catch(e){ if(run===todayRun){ box.hidden=true; box.className=''; box.innerHTML=''; } }
+  }catch(e){ f=null; }   // 엔진을 못 받아도 기록 띠는 보인다
+  if(run!==todayRun) return;
+  var nick=(p&&p.nickname)||(cands.filter(function(c){return c.nickname})[0]||{}).nickname;   // 별칭이 비어 있으면 다른 쪽 별칭
+  box.className='today jm-rise'; box.removeAttribute('aria-busy'); box.innerHTML=todayCardHtml(f,nick); wireCheckin();
 }
 /* hub-auth.js 가 로그인 확인을 이 파일보다 먼저 끝내는 경우(저장된 로그인은 바로 확인돼 이 파일이 내려받아지기 전에 끝남)를 위해,
    이 파일이 준비된 시점에 이미 로그인돼 있으면 한 번 그린다. (아직 확인 전이면 hub-auth.js 가 계정을 확인한 뒤 알아서 부른다) */
