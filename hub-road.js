@@ -37,10 +37,12 @@ function renderAdminBtn(){
   var b=document.getElementById('hadmin'), on=!!(me&&access&&access.admin&&access.loaded);
   if(!on){ if(b) b.remove(); return; }
   if(!b){
-    b=document.createElement('button'); b.id='hadmin'; b.type='button'; b.className='btn sm'; b.onclick=adminMenuSheet;
+    b=document.createElement('button'); b.id='hadmin'; b.type='button'; b.className='jn-iconbtn'; b.onclick=adminMenuSheet;   // 공유·계정과 같은 둥근 아이콘 버튼(11/21 통일)
     var ref=document.getElementById('hshare'); host.insertBefore(b,ref?ref.nextSibling:host.firstChild);
   }
-  var n=pendingCount(); b.textContent='관리자'+(n?' '+n:''); b.setAttribute('aria-label','관리자 메뉴'+(n?', 승인 대기 '+n+'건':''));
+  var n=pendingCount();
+  b.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>'+(n?'<span class="hd-badge">'+n+'</span>':'');
+  b.setAttribute('aria-label','관리자 메뉴'+(n?', 승인 대기 '+n+'건':''));
 }
 function adminMenuSheet(){
   var n=pendingCount();

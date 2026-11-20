@@ -31,3 +31,6 @@
 .ts-memo{margin:0 0 12px}
 .ts-save{width:100%}
 .ts-more{display:block;margin:12px 0 0;text-align:center;font-size:.82rem;font-weight:600;color:var(--gold-ink);text-decoration:none}
+/* 관리자 버튼(공유·계정과 같은 둥근 아이콘) 위 승인 대기 숫자 */
+#hadmin{position:relative}
+.hd-badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:var(--r-pill);background:var(--danger);color:var(--card);font-size:.68rem;font-weight:800;line-height:18px;text-align:center}
