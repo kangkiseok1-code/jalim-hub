@@ -6,12 +6,13 @@
  * 색은 jalim-base.css 의 토큰(--wood-soft 등)만 쓴다 — 여기에 색 값을 직접 쓰지 않는다. */
 var ROAD_W=330, ROAD_H=600;
 var ROAD_MAIN=['M92 70 H205 Q245 70 245 112 V150','M245 150 V190 Q245 240 200 240 H92','M92 240 C92 300 170 290 170 350','M170 350 H130 Q80 350 80 400 V440','M80 440 V470 Q80 520 130 520 H208'];
-var ROAD_BRANCH=['M245 150 H138','M170 350 L262 318','M170 350 L266 392'];
+var ROAD_BRANCH=['M245 150 H138','M245 150 L296 236','M170 350 L262 318','M170 350 L266 392'];
 /* key, 이름(줄바꿈은 |), x, y, r, 오행, 모양(solid|ring), 아이콘, 글자 크기 */
 var ROAD_NODES=[
  ['core','사주|입력',92,70,42,'wood','solid','compass',13],
  ['walk','인생|다시 걷기',245,150,46,'fire','ring','foot',13],
  ['together','함께|걷기',125,150,33,'fire','solid','two',11.5],
+ ['ret','다시 오는|그 해',296,236,30,'fire','solid','back',10.5],
  ['flow','나의|흐름',92,240,48,'earth','solid','wave',13],
  ['more','나를 더|알아보기',170,350,54,'metal','ring','search',13],
  ['peer','지인이|본 나',272,316,30,'metal','solid','people',11],
@@ -22,7 +23,7 @@ var ROAD_ICON={compass:'<circle cx="12" cy="12" r="8"/><path d="M15 9l-2 5-4 1 2
  two:'<circle cx="8" cy="8" r="2.6"/><circle cx="16" cy="8" r="2.6"/><path d="M3.5 19c.6-3.4 2.4-5 4.5-5s3.9 1.6 4.5 5M11.5 19c.6-3.4 2.4-5 4.5-5s3.9 1.6 4.5 5"/>',
  wave:'<path d="M3 9c3-4 6 4 9 0s6 4 9 0M3 15c3-4 6 4 9 0s6 4 9 0"/>',search:'<circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/>',
  people:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c.8-3.6 3-5.4 6-5.4s5.2 1.8 6 5.4"/>',rings:'<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>',
- cal:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/>',chat:'<path d="M5 6h14v10h-8l-4 4v-4H5z"/>'};
+ back:'<path d="M5 12a7 7 0 1 0 2.1-5"/><path d="M5 4v4h4"/><path d="M12 8v4l3 2"/>',cal:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/>',chat:'<path d="M5 6h14v10h-8l-4 4v-4H5z"/>'};
 /* 이야기 점: x·y = 길 위 점의 자리(그림 330x600 기준), pos = 글자 자리(a 위 · r 오른쪽), open:'story' = 허브의 자림 스토리텔링 읽기 화면.
  * 문구는 앱 첫 화면의 글을 그대로 옮김 — 바꿀 때는 여기만 고친다(\n = 줄바꿈) */
 var ROAD_STORY=[
@@ -31,7 +32,7 @@ var ROAD_STORY=[
   {x:132,y:290,pos:'r',title:'만남 글귀',t:'운명이 찾아오기만을 기다리고 있나요?\n옷깃이 스칠 일조차 드문 시대, 이제 인연은 내가 먼저 알아보는 것입니다.\n명리로 나를 비추고, 성향을 더하고, 나의 데이터를 입혔습니다.\n내가 아는 나와 남이 보는 나를 지나 나에게 맞는 사람에게로.\n— 자림과 함께합니다'},
   {x:88,y:368,pos:'a',title:'체크인 달력',t:'일확천금을 약속드릴 수는 없지만, 행복을 스스로 찾아가듯 행운도 내게 오도록 길을 낼 수는 있습니다.\n명리학으로 읽은 나의 사주로 재물이 좋은 날과 복이 드는 시기를 짚고, 내게 필요한 기운의 숫자를 골라 드립니다.\n여러 패턴과 데이터를 더해 행운을 붙잡는 작은 보탬과 소소한 즐거움이 되고자 합니다.'}
 ];
-var ROAD_LINK={core:function(A){return A+'?go=saju'},walk:function(A,B){return B+'life-walk/'},together:function(A,B){return B+'life-walk/together.html'},
+var ROAD_LINK={core:function(A){return A+'?go=saju'},walk:function(A,B){return B+'life-walk/'},together:function(A,B){return B+'life-walk/together.html'},ret:function(A,B){return B+'life-walk/?go=return'},
  flow:function(A){return A+'?go=saju'},more:function(A){return A+'?go=trait'},peer:function(A){return A+'?go=peer'},mate:function(A,B){return B+'mating-app/'},
  check:function(A,B){return B+'lotto-app/'},counsel:function(A,B){return B+'counsel-tool/'}};
 

@@ -1,5 +1,5 @@
 /* 허브 첫 화면의 '길' — 로그인한 사람에게 앱 목록 대신 "여기까지 왔어요 → 다음은 여기"를 한 폭의 그림으로 보여 준다.
- *   사주 입력 → 인생 다시 걷기 → 나의 흐름 → 나를 더 알아보기 → (운세 체크인 달력 곁가지) → 심화 상담.
+ *   사주 입력 → 인생 다시 걷기(곁가지: 함께 걷기 · 다시 오는 그 해) → 나의 흐름 → 나를 더 알아보기 → (운세 체크인 달력 곁가지) → 심화 상담.
  * 읽기만 한다(내 정보 표 4개). 로그인 전 화면과 오늘의 기운 카드는 그대로 둔다.
  * 그림(길·노드·이야기 점)은 hub-road-art.js. 쓰는 전역: me, sb, access, esc, BASE, ANALYSIS_URL, loadBirthCandidates (hub-auth.js · hub-today.js · index.html) */
 var roadData={uid:null,loaded:false,core:false,nick:'',walk:0,checkins:0,today:null,recent:[]};
