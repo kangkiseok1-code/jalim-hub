@@ -17,13 +17,13 @@
 .ts-t b,.ts-t span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ts-go{flex:none;min-height:38px;padding:0 14px;border:0;border-radius:999px;background:var(--ink);color:var(--bg);font:inherit;font-size:.8rem;font-weight:700;white-space:nowrap;cursor:pointer;touch-action:manipulation}
 .ts-res{flex:none;width:42px;height:42px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;touch-action:manipulation}
-.ts-res svg{width:42px;height:42px;display:block}
+.ts-res svg,.ts-res img{width:42px;height:42px;display:block}
 .ts-go:active,.ts-res:active{transform:scale(.94)}
 /* 기록 시트 */
 .ts-h{font-family:var(--serif);font-size:1.15rem;margin:0 0 12px}
 .ts-moods{display:flex;gap:6px;margin:0 0 12px}
 .ts-mood{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 8px;border:1px solid var(--line);border-radius:14px;background:var(--bg);color:var(--sub);font:inherit;font-size:.7rem;white-space:nowrap;cursor:pointer;touch-action:manipulation}
-.ts-mood svg{width:46px;height:46px;max-width:100%}
+.ts-mood svg,.ts-mood img{width:46px;height:46px;max-width:100%}
 .ts-mood[aria-pressed="true"]{border-color:var(--ink);background:var(--card);color:var(--ink);font-weight:700}
 .ts-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
 .ts-chip{min-height:36px;padding:0 14px;border:1px solid var(--line-strong);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:.82rem;font-weight:600;cursor:pointer;touch-action:manipulation}
