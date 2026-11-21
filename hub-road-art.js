@@ -84,15 +84,19 @@ function roadNode(n,d,here){
   var paper=el==='paper'; if(paper){ fill='var(--card)'; ink='var(--ink)'; }   // paper: 흰 종이 — 테두리는 길과 같은 색 흐름(먹 → 흰색)
   var href=ROAD_LINK[key](ANALYSIS_URL,BASE), gate=key==='counsel'?' data-gate="counsel"':'';
   var tip=ROAD_TIP[key]||'', desc=ROAD_DESC[key];
+  var tn=key==='core'&&d.core&&typeof todayNow!=='undefined'&&todayNow;   // 사주 입력 뒤: 첫 동그라미 = 오늘(색은 초록 그대로, 안에 그날 오행 작은 동그라미)
+  if(tn){ name=[tn.title]; tip='오늘의 기운 · '+tn.line+' 누르면 내 사주 분석'; }
   var s='<a href="'+href+'" class="rd-n" aria-label="'+esc(name.join(' ')+(tip?' — '+tip:''))+'"'+gate+(ROAD_EXT[key]?' target="_blank" rel="noopener"':'')+'>';
   if(here===key) s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r+9)+'" class="rd-ring"/>';
   s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" class="rd-dot" style="fill:'+fill+(ring?';stroke:'+soft+';stroke-width:6':paper?';stroke:url(#rd-pg);stroke-width:3':'')+'"/>'
     +'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="url(#rd-hi)"/>'
-    +(desc?'':'<g transform="translate('+(x-(sm?7.2:9))+' '+(y-r*.62-(sm?3:4))+') scale('+(sm?.6:.75)+')" class="rd-ic" style="stroke:'+ink+'">'+ROAD_ICON[n[7]]+'</g>');
+    +(tn?'<circle cx="'+x+'" cy="'+(y-17)+'" r="11" style="fill:var(--'+tn.c+'-soft)"/><text x="'+x+'" y="'+(y-12.5)+'" text-anchor="middle" class="rd-hz" style="fill:var(--'+tn.c+'-ink)">'+tn.h+'</text>'
+      +'<text x="'+x+'" y="'+(y+8)+'" text-anchor="middle" class="rd-nm" font-size="12.5" style="fill:'+ink+'">'+esc(tn.title)+'</text><text x="'+x+'" y="'+(y+22)+'" text-anchor="middle" class="rd-desc" font-size="9.5" style="fill:'+ink+'">오늘의 기운</text>'
+      :desc?'':'<g transform="translate('+(x-(sm?7.2:9))+' '+(y-r*.62-(sm?3:4))+') scale('+(sm?.6:.75)+')" class="rd-ic" style="stroke:'+ink+'">'+ROAD_ICON[n[7]]+'</g>');
   var f2=desc?11.5:fs, y0=desc?y-(name.length*(f2+3)+desc.length*12)/2+f2-1:y+(sm?9:3);
-  name.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+i*(f2+3))+'" text-anchor="middle" class="rd-nm" font-size="'+f2+'" style="fill:'+ink+'">'+esc(line)+'</text>'; });
+  if(!tn) name.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+i*(f2+3))+'" text-anchor="middle" class="rd-nm" font-size="'+f2+'" style="fill:'+ink+'">'+esc(line)+'</text>'; });
   if(desc) desc.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+name.length*(f2+3)+3+i*12)+'" text-anchor="middle" class="rd-desc" style="fill:'+ink+'">'+esc(line)+'</text>'; });
-  var cap=key==='walk'&&d.walk?d.walk+'곳 기록':key==='check'?(d.today?'오늘 기록 완료 · '+d.today.score+'점':'오늘 하루는 어땠나요?'):key==='counsel'?roadGateText():key==='core'&&d.loaded?(d.core?'입력됨 ✓':'지금 입력하기'):'';
+  var cap=key==='walk'&&d.walk?d.walk+'곳 기록':key==='check'?(d.today?'오늘 기록 완료 · '+d.today.score+'점':'오늘 하루는 어땠나요?'):key==='counsel'?roadGateText():key==='core'&&d.loaded?(tn?'':d.core?'입력됨 ✓':'지금 입력하기'):'';
   if(cap){   // 글자는 노드 아래. 단 운세 체크인 달력은 아래에 길이 지나가서 노드 오른쪽 빈 곳에 둔다
     if(key==='check') s+='<text x="'+(x+r+8)+'" y="'+(y+4)+'" class="rd-cap">'+esc(cap)+'</text>';
     else if(key==='counsel') s+='<text x="'+(x-r-6)+'" y="'+(y-26)+'" text-anchor="end" class="rd-cap">'+esc(cap)+'</text>';   // 심화 상담 아래는 바깥 링크 가지가 있어서 왼쪽 위 빈 곳에

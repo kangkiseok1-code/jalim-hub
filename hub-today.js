@@ -41,14 +41,10 @@ function todayFortune(E,p){
   return {elem:elem,title:d.t,line:d.line,date:(now.getMonth()+1)+'월 '+now.getDate()+'일 · '+'일월화수목금토'.charAt(now.getDay())+'요일'};
 }
 var ANALYSIS_URL=ORIGIN+'/analysis-app/';
-/* 오늘 띠(한 줄): [일진 표시 + 오늘의 날 → 누르면 내 사주 분석] [기록하기 / 고른 기분]. 출생정보가 없으면 일진 없이 기록만 */
+/* 머리 아래 한 줄(11/21 D3): [OOO님, / 오늘 기분은 어떤가요?] [기분 기록 / 고른 기분]. 오늘 일진(土 결실의 날)은 지도 첫 동그라미(todayNow)로 옮겼다 */
+var todayNow=null;   // {h:'土', c:'earth', title:'결실의 날', line} — hub-road-art.js 의 첫 동그라미가 읽는다
 function todayCardHtml(f,nick){
-  var e=f&&TODAY_ELEM[f.elem];
-  var head=e?'<a class="ts-link jm-press" href="'+ANALYSIS_URL+'?go=saju" aria-label="'+(nick?esc(nick)+'님, ':'')+'오늘은 '+e.h+' '+esc(f.title)+' · '+esc(f.line)+' 내 사주 분석 보기">'
-      +'<span class="today-mark" style="background:var(--'+e.c+'-soft);color:var(--'+e.c+'-ink)" aria-hidden="true"><span>'+e.h+'</span></span>'
-      +'<span class="ts-t"><b>'+e.h+' '+esc(f.title)+'</b><span id="ts-line">'+ckLine()+'</span></span></a>'
-    :'<div class="ts-link"><span class="ts-t"><b>'+(nick?esc(nick)+'님, ':'')+'오늘 하루</b><span id="ts-line">'+ckLine()+'</span></span></div>';
-  return '<div class="ts">'+head+ckButton()+'</div>';
+  return '<div class="ts"><div class="ts-link"><span class="ts-t"><b>'+(nick?esc(nick)+'님,':'오늘 하루')+'</b><span id="ts-line">'+ckLine()+'</span></span></div>'+ckButton()+'</div>';
 }
 /* 나의 분석 바로가기 — 검사했는지는 허브가 모른다. 눌러서 만남의 그 탭으로 가면 거기서 결과 또는 '검사하기'가 나온다 */
 var MY_TILES=[
@@ -81,7 +77,7 @@ async function refreshToday(){
   var box=document.getElementById('today'); if(!box) return;
   var run=++todayRun;
   renderMyTiles();
-  box.hidden=true; box.innerHTML='';
+  box.hidden=true; box.innerHTML=''; todayNow=null;
   if(!sb||!me) return;
   box.hidden=false; box.className='today jn-skel'; box.setAttribute('aria-busy','true');   // 엔진·기록을 받는 동안 자리만 잡아 둔다
   var f=null, p=null, cands=[];
@@ -96,7 +92,9 @@ async function refreshToday(){
   }catch(e){ f=null; }   // 엔진을 못 받아도 기록 띠는 보인다
   if(run!==todayRun) return;
   var nick=(p&&p.nickname)||(cands.filter(function(c){return c.nickname})[0]||{}).nickname;   // 별칭이 비어 있으면 다른 쪽 별칭
+  var e=f&&TODAY_ELEM[f.elem]; todayNow=e?{h:e.h,c:e.c,title:f.title,line:f.line}:null;
   box.className='today jm-rise'; box.removeAttribute('aria-busy'); box.innerHTML=todayCardHtml(f,nick); wireCheckin();
+  if(typeof renderRoad==='function') renderRoad();   // 첫 동그라미에 오늘 일진을 넣어 다시 그린다
 }
 /* hub-auth.js 가 로그인 확인을 이 파일보다 먼저 끝내는 경우(저장된 로그인은 바로 확인돼 이 파일이 내려받아지기 전에 끝남)를 위해,
    이 파일이 준비된 시점에 이미 로그인돼 있으면 한 번 그린다. (아직 확인 전이면 hub-auth.js 가 계정을 확인한 뒤 알아서 부른다) */

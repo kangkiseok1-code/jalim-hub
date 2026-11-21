@@ -14,12 +14,12 @@ async function loadCheckinToday(){
 }
 /* 띠 아래 줄(기록 전에는 질문, 뒤에는 결과)과 오른쪽 버튼 */
 function ckLine(){
-  if(!ckToday) return '오늘 하루는 어떤가요?';
+  if(!ckToday) return '오늘 기분은 어떤가요?';
   return '오늘 '+ckMood(ckToday.mood).l+(ckToday.tag?' · '+esc(ckToday.tag):'')+(ckToday.memo?' · “'+esc(ckToday.memo)+'”':'');
 }
 function ckButton(){
   return ckToday?'<button type="button" class="ts-res" id="ts-act" aria-label="오늘 기록 고치기 ('+ckMood(ckToday.mood).l+')">'+TURTLE[ckToday.mood+2]+'</button>'
-    :'<button type="button" class="ts-go" id="ts-act">기록하기</button>';
+    :'<button type="button" class="ts-go" id="ts-act"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>기분 기록</button>';
 }
 function wireCheckin(){ var b=document.getElementById('ts-act'); if(b) b.onclick=ckSheet; }
 function ckRefreshStrip(){
