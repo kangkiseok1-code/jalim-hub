@@ -1,5 +1,5 @@
 /* 허브 첫 화면의 '길' — 로그인한 사람에게 앱 목록 대신 "여기까지 왔어요 → 다음은 여기"를 한 폭의 그림으로 보여 준다.
- *   사주 입력 → 인생 다시 걷기(곁가지: 함께 걷기 · 다시 오는 그 해) → 나의 흐름 → 나를 더 알아보기 → (운세 체크인 달력 곁가지) → 심화 상담.
+ *   사주 입력 → 인생 다시 걷기(곁가지: 함께 걷기 · 다시 오는 그 해) → 나의 흐름 → 나를 더 알아보기 → (운세 체크인 달력 곁가지) → 심화 상담(곁가지: 블로그 · 쓰레드 · 초코서당).
  * 읽기만 한다(내 정보 표 4개). 로그인 전 화면과 오늘의 기운 카드는 그대로 둔다.
  * 그림(길·노드·이야기 점)은 hub-road-art.js. 쓰는 전역: me, sb, access, esc, BASE, ANALYSIS_URL, loadBirthCandidates (hub-auth.js · hub-today.js · index.html) */
 var roadData={uid:null,loaded:false,core:false,nick:'',walk:0,checkins:0,today:null,recent:[]};
@@ -59,21 +59,13 @@ function roadFail(box,e){
   document.body.classList.remove('in-road'); box.hidden=false;
   box.innerHTML='<div class="road-err" role="alert">지도를 그리지 못했어요 <small>'+esc(String(e&&e.message||e))+'</small> <button class="btn sm" type="button" onclick="location.reload()">새로고침</button></div>';
 }
-/* 지도 끝: 자림 블로그·쓰레드 바로가기 (새 탭, 폰에선 쓰레드 앱) */
-function roadSnsHtml(){
-  var a=function(href,ic,t,s){return '<a href="'+href+'" target="_blank" rel="noopener"'+(s?' aria-label="'+t+' '+s+'"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+ic+'</svg>'+t+'</a>'};   // 세 칸이 한 줄에 들어가도록 작은 설명은 읽기용 이름으로만
-  return '<div class="sns"><b>자림의 이야기 더 보기</b><div class="sns-row">'
-   +a('https://blog.naver.com/jalim_16','<path d="M5 4h10l4 4v12H5z"/><path d="M15 4v4h4M8 12h8M8 16h6"/>','블로그','긴 글')
-   +a('https://www.threads.com/@jalim_16','<circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1"/>','쓰레드','@jalim_16')
-   +a('https://chocosd.com/%ec%83%81%eb%8b%b4-%eb%b0%8f-%ed%95%84%ec%9e%90-%ec%95%88%eb%82%b4/%ec%9e%90%eb%a6%bc-%ec%82%ac%ec%a3%bc%ec%83%81%eb%8b%b4-%ec%95%88%eb%82%b4/','<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 3.8-6 7-6s6 2 7 6"/>','초코서당','자림 소개')+'</div></div>';
-}
 function roadSafe(fn){ try{ fn(); }catch(e){ try{ console.error('허브 지도 부가 기능 오류',e); }catch(_){} } }
 function renderRoad(){
   var box=document.getElementById('road'); if(!box) return;
   var html;
   try{
     var d=(me&&roadData.uid===me.id)?roadData:{core:false,walk:0,checkins:0,today:null,recent:[false,false,false,false,false],nick:''};
-    html='<h2 class="road-h">'+(me?(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요':'나를 알아가는 길')+'</h2>'+roadArtHtml(d)+(me?roadSnsHtml():'');
+    html='<h2 class="road-h">'+(me?(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요':'나를 알아가는 길')+'</h2>'+roadArtHtml(d);
     if(typeof idleBannerHtml==='function') html=idleBannerHtml()+html;
   }catch(e){ roadFail(box,e); return; }
   box.innerHTML=html; box.hidden=false; document.body.classList.add('in-road');

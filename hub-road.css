@@ -6,7 +6,7 @@
 .road-err{margin:0 0 12px;padding:12px 14px;background:var(--fire-tint);color:var(--fire-deep);border-radius:var(--r-list);font-size:.88rem;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
 .road-err small{flex-basis:100%;opacity:.8;font-size:.75rem;overflow-wrap:anywhere}
 /* 나만의 길 그림 (hub-road-art.js) — 색은 모두 jalim-base.css 토큰 */
-.rd-art{position:relative;width:100%;aspect-ratio:330/600;margin:0 0 8px}
+.rd-art{position:relative;width:100%;aspect-ratio:330/660;margin:0 0 8px}
 .rd-art svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .rd-draw{stroke-dasharray:1;stroke-dashoffset:1;animation:rd-draw 1.4s ease-out forwards}
 .rd-d2{animation-delay:.25s}.rd-d3{animation-delay:.5s}
@@ -42,9 +42,3 @@
 .rd-desc{font-family:inherit;font-size:10.5px;font-weight:700;opacity:.9}
 .in-road .foot{display:none}
 .jn-x{position:sticky;top:0;float:right;z-index:1;width:44px;height:44px;margin:-12px -8px 0 0;border:0;border-radius:var(--r-pill);background:var(--card);color:var(--sub);font:inherit;font-size:1.1rem;cursor:pointer;touch-action:manipulation}
-/* 지도 끝: 자림 블로그·쓰레드 바로가기 (11/21) */
-.sns{margin:6px 0 18px;padding:16px;border-radius:var(--r-list);background:var(--card);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:10px}
-.sns b{font-family:var(--serif);font-size:1.02rem}
-.sns-row{display:flex;gap:6px}
-.sns-row a{flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 6px;border-radius:var(--r-pill);border:1px solid var(--line-strong);background:var(--bg);color:var(--ink);font-weight:700;font-size:.88rem;text-decoration:none;white-space:nowrap}
-.sns-row svg{width:18px;height:18px;fill:none;stroke:var(--gold-ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}

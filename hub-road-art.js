@@ -4,9 +4,10 @@
  *   ROAD_NODES              : 노드 위치·크기·오행·모양·아이콘
  *   ROAD_STORY              : 선 위 '글' 점의 자리와 말풍선 문구
  * 색은 jalim-base.css 의 토큰(--wood-soft 등)만 쓴다 — 여기에 색 값을 직접 쓰지 않는다. */
-var ROAD_W=330, ROAD_H=600;
+var ROAD_W=330, ROAD_H=660;
 var ROAD_MAIN=['M92 70 H205 Q245 70 245 112 V150','M245 150 V190 Q245 240 200 240 H92','M92 240 C92 300 170 290 170 350','M170 350 H130 Q80 350 80 400 V440','M80 440 V470 Q80 520 130 520 H208'];
-var ROAD_BRANCH=['M245 150 H138','M245 150 L296 236','M170 350 L262 318','M170 350 L266 392'];
+var ROAD_BRANCH=['M245 150 H138','M245 150 L296 236','M170 350 L262 318','M170 350 L266 392',
+ 'M224 520 L150 606','M224 520 L224 626','M224 520 L298 606'];   // 심화 상담 아래 바깥 링크 3개(블로그·쓰레드·초코서당)
 /* key, 이름(줄바꿈은 |), x, y, r, 오행, 모양(solid|ring), 아이콘, 글자 크기 */
 var ROAD_NODES=[
  ['core','사주|입력',92,70,42,'wood','solid','compass',13],
@@ -18,12 +19,16 @@ var ROAD_NODES=[
  ['peer','지인이|본 나',272,316,30,'metal','solid','people',11],
  ['mate','만남',276,396,30,'metal','solid','rings',12],
  ['check','운세 체크인|달력',80,440,50,'water','solid','cal',11.5],
- ['counsel','심화|상담',224,520,46,'water','solid','chat',13]];
+ ['counsel','심화|상담',224,520,46,'water','solid','chat',13],
+ ['blog','블로그',150,606,27,'water','solid','doc',11],
+ ['threads','쓰레드',224,626,27,'water','solid','at',11],
+ ['choco','초코서당',298,606,27,'water','solid','person',10.5]];
 var ROAD_ICON={compass:'<circle cx="12" cy="12" r="8"/><path d="M15 9l-2 5-4 1 2-5z"/>',foot:'<ellipse cx="9" cy="8" rx="2.4" ry="3.6"/><ellipse cx="15.5" cy="14" rx="2.4" ry="3.6"/>',
  two:'<circle cx="8" cy="8" r="2.6"/><circle cx="16" cy="8" r="2.6"/><path d="M3.5 19c.6-3.4 2.4-5 4.5-5s3.9 1.6 4.5 5M11.5 19c.6-3.4 2.4-5 4.5-5s3.9 1.6 4.5 5"/>',
  wave:'<path d="M3 9c3-4 6 4 9 0s6 4 9 0M3 15c3-4 6 4 9 0s6 4 9 0"/>',search:'<circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/>',
  people:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c.8-3.6 3-5.4 6-5.4s5.2 1.8 6 5.4"/>',rings:'<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>',
- back:'<path d="M5 12a7 7 0 1 0 2.1-5"/><path d="M5 4v4h4"/><path d="M12 8v4l3 2"/>',cal:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/>',chat:'<path d="M5 6h14v10h-8l-4 4v-4H5z"/>'};
+ back:'<path d="M5 12a7 7 0 1 0 2.1-5"/><path d="M5 4v4h4"/><path d="M12 8v4l3 2"/>',cal:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/>',chat:'<path d="M5 6h14v10h-8l-4 4v-4H5z"/>',
+ doc:'<path d="M5 4h10l4 4v12H5z"/><path d="M15 4v4h4M8 12h8M8 16h6"/>',at:'<circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1"/>',person:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 3.8-6 7-6s6 2 7 6"/>'};
 /* 이야기 점: x·y = 길 위 점의 자리(그림 330x600 기준), pos = 글자 자리(a 위 · r 오른쪽), open:'story' = 허브의 자림 스토리텔링 읽기 화면.
  * 문구는 앱 첫 화면의 글을 그대로 옮김 — 바꿀 때는 여기만 고친다(\n = 줄바꿈) */
 var ROAD_STORY=[
@@ -34,10 +39,13 @@ var ROAD_STORY=[
 ];
 var ROAD_LINK={core:function(A){return A+'?go=saju'},walk:function(A,B){return B+'life-walk/'},together:function(A,B){return B+'life-walk/together.html'},ret:function(A,B){return B+'life-walk/?go=return'},
  flow:function(A){return A+'?go=saju'},more:function(A){return A+'?go=trait'},peer:function(A){return A+'?go=peer'},mate:function(A,B){return B+'mating-app/'},
- check:function(A,B){return B+'lotto-app/'},counsel:function(A,B){return B+'counsel-tool/'}};
+ check:function(A,B){return B+'lotto-app/'},counsel:function(A,B){return B+'counsel-tool/'},
+ blog:function(){return 'https://blog.naver.com/jalim_16'},threads:function(){return 'https://www.threads.com/@jalim_16'},
+ choco:function(){return 'https://chocosd.com/%ec%83%81%eb%8b%b4-%eb%b0%8f-%ed%95%84%ec%9e%90-%ec%95%88%eb%82%b4/%ec%9e%90%eb%a6%bc-%ec%82%ac%ec%a3%bc%ec%83%81%eb%8b%b4-%ec%95%88%eb%82%b4/'}};
+var ROAD_EXT={blog:1,threads:1,choco:1};   // 바깥 사이트: 새 탭(폰에선 쓰레드 앱)
 
 /* 노드 설명 글자: 마우스를 올리거나, 휴대폰에서 길게 누르면 노드 위에 잠깐 나온다. 짧게 누르면 그대로 이동 */
-var ROAD_TIP={flow:'사주 분석',more:'성향, 기호, 대인관계 분석',check:'일운 재물운 기록'};   // 접근성 이름용
+var ROAD_TIP={flow:'사주 분석',more:'성향, 기호, 대인관계 분석',check:'일운 재물운 기록',blog:'자림 블로그',threads:'자림 쓰레드',choco:'초코서당 자림 소개'};   // 접근성 이름용
 /* 원 안에 늘 보이는 설명(휴대폰에서 길게 누를 틈이 없어서) — 이 세 노드만 아이콘 대신 이름 아래 작은 글씨 */
 var ROAD_DESC={flow:['사주 분석'],more:['성향·기호','대인관계'],check:['일운·재물운','기록']};
 function wireRoadTips(box){
@@ -70,22 +78,23 @@ function roadGateText(){
 }
 /* 노드 한 개: 파스텔 원(또는 고리) + 아이콘 + 이름. 글자색은 오행별 -ink 토큰 */
 function roadNode(n,d,here){
-  var key=n[0],name=n[1].split('|'),x=n[2],y=n[3],r=n[4],el=n[5],ring=n[6]==='ring',fs=n[8];
+  var key=n[0],name=n[1].split('|'),x=n[2],y=n[3],r=n[4],el=n[5],ring=n[6]==='ring',fs=n[8],sm=r<30;   // sm: 작은 바깥 링크 노드 — 아이콘 작게, 이름 조금 아래
   var soft='var(--'+el+'-soft)', ink=ring?(el==='fire'?'var(--fire-deep)':'var(--metal-ink)'):'var(--'+el+'-ink)';
   var fill=ring?(el==='fire'?'var(--fire-tint)':'var(--metal-tint)'):soft;
   var href=ROAD_LINK[key](ANALYSIS_URL,BASE), gate=key==='counsel'?' data-gate="counsel"':'';
   var tip=ROAD_TIP[key]||'', desc=ROAD_DESC[key];
-  var s='<a href="'+href+'" class="rd-n" aria-label="'+esc(name.join(' ')+(tip?' — '+tip:''))+'"'+gate+''+'>';
+  var s='<a href="'+href+'" class="rd-n" aria-label="'+esc(name.join(' ')+(tip?' — '+tip:''))+'"'+gate+(ROAD_EXT[key]?' target="_blank" rel="noopener"':'')+'>';
   if(here===key) s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r+9)+'" class="rd-ring"/>';
   s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" class="rd-dot" style="fill:'+fill+(ring?';stroke:'+soft+';stroke-width:6':'')+'"/>'
     +'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="url(#rd-hi)"/>'
-    +(desc?'':'<g transform="translate('+(x-9)+' '+(y-r*.62-4)+') scale(.75)" class="rd-ic" style="stroke:'+ink+'">'+ROAD_ICON[n[7]]+'</g>');
-  var f2=desc?11.5:fs, y0=desc?y-(name.length*(f2+3)+desc.length*12)/2+f2-1:y+3;
+    +(desc?'':'<g transform="translate('+(x-(sm?7.2:9))+' '+(y-r*.62-(sm?3:4))+') scale('+(sm?.6:.75)+')" class="rd-ic" style="stroke:'+ink+'">'+ROAD_ICON[n[7]]+'</g>');
+  var f2=desc?11.5:fs, y0=desc?y-(name.length*(f2+3)+desc.length*12)/2+f2-1:y+(sm?9:3);
   name.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+i*(f2+3))+'" text-anchor="middle" class="rd-nm" font-size="'+f2+'" style="fill:'+ink+'">'+esc(line)+'</text>'; });
   if(desc) desc.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+name.length*(f2+3)+3+i*12)+'" text-anchor="middle" class="rd-desc" style="fill:'+ink+'">'+esc(line)+'</text>'; });
   var cap=key==='walk'&&d.walk?d.walk+'곳 기록':key==='check'?(d.today?'오늘 기록 완료 · '+d.today.score+'점':'오늘 하루는 어땠나요?'):key==='counsel'?roadGateText():key==='core'&&d.loaded?(d.core?'입력됨 ✓':'지금 입력하기'):'';
   if(cap){   // 글자는 노드 아래. 단 운세 체크인 달력은 아래에 길이 지나가서 노드 오른쪽 빈 곳에 둔다
     if(key==='check') s+='<text x="'+(x+r+8)+'" y="'+(y+4)+'" class="rd-cap">'+esc(cap)+'</text>';
+    else if(key==='counsel') s+='<text x="'+(x-r-6)+'" y="'+(y-26)+'" text-anchor="end" class="rd-cap">'+esc(cap)+'</text>';   // 심화 상담 아래는 바깥 링크 가지가 있어서 왼쪽 위 빈 곳에
     else s+='<text x="'+x+'" y="'+(y+r+15)+'" text-anchor="middle" class="rd-cap">'+esc(cap)+'</text>';
   }
   return s+'</a>';
