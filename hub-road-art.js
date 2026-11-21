@@ -20,9 +20,9 @@ var ROAD_NODES=[
  ['mate','만남',276,396,30,'metal','solid','rings',12],
  ['check','운세 체크인|달력',80,440,50,'water','solid','cal',11.5],
  ['counsel','심화|상담',224,520,46,'water','solid','chat',13],
- ['blog','블로그',150,606,27,'water','solid','doc',11],
- ['threads','쓰레드',224,626,27,'water','solid','at',11],
- ['choco','초코서당',298,606,27,'water','solid','person',10.5]];
+ ['blog','블로그',150,606,27,'paper','solid','doc',11],
+ ['threads','쓰레드',224,626,27,'paper','solid','at',11],
+ ['choco','초코서당',298,606,27,'paper','solid','person',10.5]];
 var ROAD_ICON={compass:'<circle cx="12" cy="12" r="8"/><path d="M15 9l-2 5-4 1 2-5z"/>',foot:'<ellipse cx="9" cy="8" rx="2.4" ry="3.6"/><ellipse cx="15.5" cy="14" rx="2.4" ry="3.6"/>',
  two:'<circle cx="8" cy="8" r="2.6"/><circle cx="16" cy="8" r="2.6"/><path d="M3.5 19c.6-3.4 2.4-5 4.5-5s3.9 1.6 4.5 5M11.5 19c.6-3.4 2.4-5 4.5-5s3.9 1.6 4.5 5"/>',
  wave:'<path d="M3 9c3-4 6 4 9 0s6 4 9 0M3 15c3-4 6 4 9 0s6 4 9 0"/>',search:'<circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/>',
@@ -81,11 +81,12 @@ function roadNode(n,d,here){
   var key=n[0],name=n[1].split('|'),x=n[2],y=n[3],r=n[4],el=n[5],ring=n[6]==='ring',fs=n[8],sm=r<30;   // sm: 작은 바깥 링크 노드 — 아이콘 작게, 이름 조금 아래
   var soft='var(--'+el+'-soft)', ink=ring?(el==='fire'?'var(--fire-deep)':'var(--metal-ink)'):'var(--'+el+'-ink)';
   var fill=ring?(el==='fire'?'var(--fire-tint)':'var(--metal-tint)'):soft;
+  var paper=el==='paper'; if(paper){ fill='var(--card)'; ink='var(--ink)'; }   // paper: 흰 종이 — 테두리는 길과 같은 색 흐름(먹 → 흰색)
   var href=ROAD_LINK[key](ANALYSIS_URL,BASE), gate=key==='counsel'?' data-gate="counsel"':'';
   var tip=ROAD_TIP[key]||'', desc=ROAD_DESC[key];
   var s='<a href="'+href+'" class="rd-n" aria-label="'+esc(name.join(' ')+(tip?' — '+tip:''))+'"'+gate+(ROAD_EXT[key]?' target="_blank" rel="noopener"':'')+'>';
   if(here===key) s+='<circle cx="'+x+'" cy="'+y+'" r="'+(r+9)+'" class="rd-ring"/>';
-  s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" class="rd-dot" style="fill:'+fill+(ring?';stroke:'+soft+';stroke-width:6':'')+'"/>'
+  s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" class="rd-dot" style="fill:'+fill+(ring?';stroke:'+soft+';stroke-width:6':paper?';stroke:url(#rd-pg);stroke-width:3':'')+'"/>'
     +'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="url(#rd-hi)"/>'
     +(desc?'':'<g transform="translate('+(x-(sm?7.2:9))+' '+(y-r*.62-(sm?3:4))+') scale('+(sm?.6:.75)+')" class="rd-ic" style="stroke:'+ink+'">'+ROAD_ICON[n[7]]+'</g>');
   var f2=desc?11.5:fs, y0=desc?y-(name.length*(f2+3)+desc.length*12)/2+f2-1:y+(sm?9:3);
@@ -102,7 +103,7 @@ function roadNode(n,d,here){
 function roadArtHtml(d){
   var here=!d.loaded?'':!d.core?'core':!d.walk?'walk':'';
   var svg='<svg viewBox="0 0 '+ROAD_W+' '+ROAD_H+'" aria-label="나의 길 지도"><defs>'
-   +'<linearGradient id="rd-pg" gradientUnits="userSpaceOnUse" x1="0" y1="50" x2="0" y2="540"><stop offset="0" style="stop-color:var(--wood-soft)"/><stop offset=".26" style="stop-color:var(--fire-soft)"/><stop offset=".5" style="stop-color:var(--earth-soft)"/><stop offset=".72" style="stop-color:var(--metal-soft)"/><stop offset="1" style="stop-color:var(--water-soft)"/></linearGradient>'
+   +'<linearGradient id="rd-pg" gradientUnits="userSpaceOnUse" x1="0" y1="50" x2="0" y2="640"><stop offset="0" style="stop-color:var(--wood-soft)"/><stop offset=".22" style="stop-color:var(--fire-soft)"/><stop offset=".41" style="stop-color:var(--earth-soft)"/><stop offset=".6" style="stop-color:var(--metal-soft)"/><stop offset=".83" style="stop-color:var(--water-soft)"/><stop offset="1" style="stop-color:var(--line-strong)"/></linearGradient>'
    +'<radialGradient id="rd-hi" cx=".35" cy=".28" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
    +'<filter id="rd-soft" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="6" style="flood-color:var(--shadow-ink)"/></filter></defs>'
    +'<g filter="url(#rd-soft)" fill="none" stroke="url(#rd-pg)" stroke-linecap="round">'
