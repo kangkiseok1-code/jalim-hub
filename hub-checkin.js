@@ -4,7 +4,7 @@
 var CK_MOODS=[{v:-2,l:'많이 힘듦'},{v:-1,l:'조금 힘듦'},{v:0,l:'보통'},{v:1,l:'괜찮음'},{v:2,l:'아주 좋음'}];
 var CK_TAGS=['건강','돈','기분','사랑','일','쉼'];   // 달력 Balbok.TAGS 와 같은 이름
 var CK_SCORE=[1,3,5,8,10];   // 기분 → 달력 점수 (Balbok.scoreFromMood 와 같음)
-var CHECKIN_URL=ORIGIN+'/checkin/';
+var CHECKIN_URL=ORIGIN+'/lotto-app/?day=today';   // 운세 체크인 달력의 오늘 일 페이지(방금 남긴 기록·반복점수)
 var ckToday=null;   // 오늘 기록 {mood,tag,memo} 또는 null
 function ckKey(){ var d=new Date(),p=function(n){return (n<10?'0':'')+n}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function ckMood(v){ return CK_MOODS.filter(function(m){return m.v===v})[0]||CK_MOODS[2]; }
@@ -37,7 +37,7 @@ function ckSheet(){
       return '<button type="button" class="ts-chip" data-t="'+t+'" aria-pressed="'+(d.tag===t)+'">'+t+'</button>'; }).join('')+'</div>'
     +'<input class="ts-memo" id="ts-memo" maxlength="40" placeholder="한 줄 메모 (선택, 40자)" value="'+esc(ckToday&&ckToday.memo||'')+'">'
     +'<button type="button" class="btn ts-save" id="ts-save"'+(d.mood==null?' disabled':'')+'>저장</button>'
-    +'<a class="ts-more" href="'+CHECKIN_URL+'">기운 달력에서 보기 ›</a>');
+    +'<a class="ts-more" href="'+CHECKIN_URL+'">운세 달력에서 보기 ›</a>');
   var root=sheetEl, save=root.querySelector('#ts-save');
   root.querySelectorAll('.ts-mood').forEach(function(b){ b.onclick=function(){
     d.mood=+b.dataset.v; root.querySelectorAll('.ts-mood').forEach(function(o){o.setAttribute('aria-pressed',String(o===b))}); save.disabled=false; }; });
