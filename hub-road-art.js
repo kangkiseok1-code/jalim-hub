@@ -74,7 +74,7 @@ function roadGateText(){
   if(!me||!access||!access.loaded) return '';
   if(access.admin) { var n=pendingCount(); return n?'신청 '+n+'건':''; }
   var s=access.counsel;
-  return s==='pending'?'승인 대기':s==='rejected'?'승인 안 됨':s!=='approved'?'신청 필요':'이용 가능 ✓';
+  return s==='pending'?'승인 대기':s==='rejected'?'승인 안 됨':s!=='approved'?'신청 필요':'';   // 승인된 뒤엔 문구 없음(11/22)
 }
 /* 노드 한 개: 파스텔 원(또는 고리) + 아이콘 + 이름. 글자색은 오행별 -ink 토큰 */
 function roadNode(n,d,here){
@@ -96,10 +96,9 @@ function roadNode(n,d,here){
   var f2=desc?11.5:fs, y0=desc?y-(name.length*(f2+3)+desc.length*12)/2+f2-1:y+(sm?9:3);
   if(!tn) name.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+i*(f2+3))+'" text-anchor="middle" class="rd-nm" font-size="'+f2+'" style="fill:'+ink+'">'+esc(line)+'</text>'; });
   if(desc) desc.forEach(function(line,i){ s+='<text x="'+x+'" y="'+(y0+name.length*(f2+3)+3+i*12)+'" text-anchor="middle" class="rd-desc" style="fill:'+ink+'">'+esc(line)+'</text>'; });
-  var cap=key==='walk'&&d.walk?d.walk+'곳 기록':key==='check'?(d.today?'오늘 기록 완료 · '+d.today.score+'점':'오늘 하루는 어땠나요?'):key==='counsel'?roadGateText():key==='core'&&d.loaded?(tn?'':d.core?'입력됨 ✓':'지금 입력하기'):'';
-  if(cap){   // 글자는 노드 아래. 단 운세 체크인 달력은 아래에 길이 지나가서 노드 오른쪽 빈 곳에 둔다
-    if(key==='check') s+='<text x="'+(x+r+8)+'" y="'+(y+4)+'" class="rd-cap">'+esc(cap)+'</text>';
-    else if(key==='counsel') s+='<text x="'+(x-r-6)+'" y="'+(y-26)+'" text-anchor="end" class="rd-cap">'+esc(cap)+'</text>';   // 심화 상담 아래는 바깥 링크 가지가 있어서 왼쪽 위 빈 곳에
+  var cap=key==='counsel'?roadGateText():key==='core'&&d.loaded?(tn?'':d.core?'입력됨 ✓':'지금 입력하기'):'';   // 걷기 'N곳 기록'·달력 '오늘 기록 완료'는 11/22 뺌(설명 없어도 됨)
+  if(cap){   // 글자는 노드 아래
+    if(key==='counsel') s+='<text x="'+(x-r-6)+'" y="'+(y-26)+'" text-anchor="end" class="rd-cap">'+esc(cap)+'</text>';   // 심화 상담 아래는 바깥 링크 가지가 있어서 왼쪽 위 빈 곳에
     else s+='<text x="'+x+'" y="'+(y+r+15)+'" text-anchor="middle" class="rd-cap">'+esc(cap)+'</text>';
   }
   return s+'</a>';
