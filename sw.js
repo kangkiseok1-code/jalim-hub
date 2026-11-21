@@ -1,5 +1,5 @@
 /* 자림 허브 PWA 서비스 워커 — 껍데기 네트워크 우선, CDN·Supabase 통과 */
-const CACHE = 'jalim-hub-v41';
+const CACHE = 'jalim-hub-v42';
 const SHELL = ['./', 'index.html', 'hub-auth.js', 'hub-today.js', 'hub-today.css', 'hub-checkin.js', 'hub-turtle.js', 'turtle/t1.webp', 'turtle/t2.webp', 'turtle/t3.webp', 'turtle/t4.webp', 'turtle/t5.webp', 'hub-road.js', 'hub-core.js', 'phone-check.js', 'hub-counsel.js', 'birth-check.js', 'hub-road-art.js', 'hub-road.css', 'jalim-base.css', 'icon-192.png', 'icon-512.png', 'manifest.webmanifest'];
 
 self.addEventListener('install', e => {

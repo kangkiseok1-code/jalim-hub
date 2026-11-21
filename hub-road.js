@@ -59,13 +59,20 @@ function roadFail(box,e){
   document.body.classList.remove('in-road'); box.hidden=false;
   box.innerHTML='<div class="road-err" role="alert">지도를 그리지 못했어요 <small>'+esc(String(e&&e.message||e))+'</small> <button class="btn sm" type="button" onclick="location.reload()">새로고침</button></div>';
 }
+/* 지도 끝: 자림 블로그·쓰레드 바로가기 (새 탭, 폰에선 쓰레드 앱) */
+function roadSnsHtml(){
+  var a=function(href,ic,t,s){return '<a href="'+href+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true">'+ic+'</svg>'+t+' <small>'+s+'</small></a>'};
+  return '<div class="sns"><b>자림의 이야기 더 보기</b><p>명리로 사람을 읽는 이야기 — 긴 글은 블로그, 짧은 글은 쓰레드에서.</p><div class="sns-row">'
+   +a('https://blog.naver.com/jalim_16','<path d="M5 4h10l4 4v12H5z"/><path d="M15 4v4h4M8 12h8M8 16h6"/>','블로그','긴 글')
+   +a('https://www.threads.com/@jalim_16','<circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1"/>','쓰레드','@jalim_16')+'</div></div>';
+}
 function roadSafe(fn){ try{ fn(); }catch(e){ try{ console.error('허브 지도 부가 기능 오류',e); }catch(_){} } }
 function renderRoad(){
   var box=document.getElementById('road'); if(!box) return;
   var html;
   try{
     var d=(me&&roadData.uid===me.id)?roadData:{core:false,walk:0,checkins:0,today:null,recent:[false,false,false,false,false],nick:''};
-    html='<h2 class="road-h">'+(me?(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요':'나를 알아가는 길')+'</h2>'+roadArtHtml(d)+(me?'<p class="rd-hint">초록 점을 누르면 이야기가 나와요</p>':'');
+    html='<h2 class="road-h">'+(me?(d.nick?esc(d.nick)+'님, ':'')+'오늘은 여기까지 와 있어요':'나를 알아가는 길')+'</h2>'+roadArtHtml(d)+(me?'<p class="rd-hint">초록 점을 누르면 이야기가 나와요</p>'+roadSnsHtml():'');
     if(typeof idleBannerHtml==='function') html=idleBannerHtml()+html;
   }catch(e){ roadFail(box,e); return; }
   box.innerHTML=html; box.hidden=false; document.body.classList.add('in-road');
