@@ -61,10 +61,11 @@ function roadFail(box,e){
 }
 /* 지도 끝: 자림 블로그·쓰레드 바로가기 (새 탭, 폰에선 쓰레드 앱) */
 function roadSnsHtml(){
-  var a=function(href,ic,t,s){return '<a href="'+href+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true">'+ic+'</svg>'+t+' <small>'+s+'</small></a>'};
+  var a=function(href,ic,t,s){return '<a href="'+href+'" target="_blank" rel="noopener"'+(s?' aria-label="'+t+' '+s+'"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+ic+'</svg>'+t+'</a>'};   // 세 칸이 한 줄에 들어가도록 작은 설명은 읽기용 이름으로만
   return '<div class="sns"><b>자림의 이야기 더 보기</b><p>명리로 사람을 읽는 이야기 — 긴 글은 블로그, 짧은 글은 쓰레드에서.</p><div class="sns-row">'
    +a('https://blog.naver.com/jalim_16','<path d="M5 4h10l4 4v12H5z"/><path d="M15 4v4h4M8 12h8M8 16h6"/>','블로그','긴 글')
-   +a('https://www.threads.com/@jalim_16','<circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1"/>','쓰레드','@jalim_16')+'</div></div>';
+   +a('https://www.threads.com/@jalim_16','<circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1"/>','쓰레드','@jalim_16')
+   +a('https://chocosd.com/%ec%83%81%eb%8b%b4-%eb%b0%8f-%ed%95%84%ec%9e%90-%ec%95%88%eb%82%b4/%ec%9e%90%eb%a6%bc-%ec%82%ac%ec%a3%bc%ec%83%81%eb%8b%b4-%ec%95%88%eb%82%b4/','<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 3.8-6 7-6s6 2 7 6"/>','자림 소개','초코서당')+'</div></div>';
 }
 function roadSafe(fn){ try{ fn(); }catch(e){ try{ console.error('허브 지도 부가 기능 오류',e); }catch(_){} } }
 function renderRoad(){

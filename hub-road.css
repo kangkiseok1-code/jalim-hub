@@ -46,7 +46,6 @@
 /* 지도 끝: 자림 블로그·쓰레드 바로가기 (11/21) */
 .sns{margin:6px 0 18px;padding:16px;border-radius:var(--r-list);background:var(--card);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:10px}
 .sns b{font-family:var(--serif);font-size:1.02rem}.sns p{margin:0;font-size:.82rem;color:var(--sub);line-height:1.5;word-break:keep-all}
-.sns-row{display:flex;gap:8px}
-.sns-row a{flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:var(--r-pill);border:1px solid var(--line-strong);background:var(--bg);color:var(--ink);font-weight:700;font-size:.88rem;text-decoration:none;white-space:nowrap}
+.sns-row{display:flex;gap:6px}
+.sns-row a{flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 6px;border-radius:var(--r-pill);border:1px solid var(--line-strong);background:var(--bg);color:var(--ink);font-weight:700;font-size:.88rem;text-decoration:none;white-space:nowrap}
 .sns-row svg{width:18px;height:18px;fill:none;stroke:var(--gold-ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.sns-row small{font-weight:600;color:var(--sub);font-size:.72rem}
