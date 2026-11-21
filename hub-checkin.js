@@ -1,15 +1,16 @@
 /* 허브 오늘 띠의 '오늘 하루는 어떤가요?' — 기운 체크인 앱과 같은 기록(daily_checkins, 본인만)에 오늘 기분을 남긴다.
    띠 오른쪽: 기록 전 [기록하기] → 아래에서 시트가 올라옴 / 기록 뒤 고른 알거북 아이콘(누르면 다시 고침).
-   기분 값·이름표·칩은 checkin/checkin-core.js 와 같게 둔다(같은 표를 같이 쓰므로). */
+   기분 값·이름표는 checkin/checkin-core.js 와 같게, 칩과 점수(1~10)는 운세 체크인 달력(lotto-app/balbok.js)과 같게 둔다 — 달력에서 '내 하루'로 바로 보이도록. */
 var CK_MOODS=[{v:-2,l:'많이 힘듦'},{v:-1,l:'조금 힘듦'},{v:0,l:'보통'},{v:1,l:'괜찮음'},{v:2,l:'아주 좋음'}];
-var CK_TAGS=['일','사람','돈','몸','마음','쉼'];
+var CK_TAGS=['건강','돈','기분','사랑','일','쉼'];   // 달력 Balbok.TAGS 와 같은 이름
+var CK_SCORE=[1,3,5,8,10];   // 기분 → 달력 점수 (Balbok.scoreFromMood 와 같음)
 var CHECKIN_URL=ORIGIN+'/checkin/';
 var ckToday=null;   // 오늘 기록 {mood,tag,memo} 또는 null
 function ckKey(){ var d=new Date(),p=function(n){return (n<10?'0':'')+n}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function ckMood(v){ return CK_MOODS.filter(function(m){return m.v===v})[0]||CK_MOODS[2]; }
 async function loadCheckinToday(){
   ckToday=null; if(!sb||!me) return null;
-  try{ var r=await sb.from('daily_checkins').select('mood,tag,memo').eq('user_id',me.id).eq('day',ckKey()).maybeSingle(); ckToday=r.error?null:r.data; }catch(e){ ckToday=null; }
+  try{ var r=await sb.from('daily_checkins').select('mood,score,tag,memo').eq('user_id',me.id).eq('day',ckKey()).maybeSingle(); ckToday=r.error?null:r.data; }catch(e){ ckToday=null; }
   return ckToday;
 }
 /* 띠 아래 줄(기록 전에는 질문, 뒤에는 결과)과 오른쪽 버튼 */
@@ -46,8 +47,9 @@ function ckSheet(){
     if(d.mood==null||!sb||!me) return;
     var memo=root.querySelector('#ts-memo').value.trim().slice(0,40)||null;
     save.disabled=true; save.textContent='저장 중…';
-    var r=await sb.from('daily_checkins').upsert({user_id:me.id,day:ckKey(),mood:d.mood,tag:d.tag||null,memo:memo},{onConflict:'user_id,day'});
+    var score=ckToday&&ckToday.mood===d.mood&&ckToday.score?ckToday.score:CK_SCORE[d.mood+2];   // 달력에서 고른 점수는 기분이 같으면 그대로 둔다
+    var r=await sb.from('daily_checkins').upsert({user_id:me.id,day:ckKey(),mood:d.mood,score:score,tag:d.tag||null,memo:memo},{onConflict:'user_id,day'});
     if(r.error){ save.disabled=false; save.textContent='저장'; toast('저장하지 못했어요. 다시 눌러 주세요'); return; }
-    ckToday={mood:d.mood,tag:d.tag||null,memo:memo}; closeSheet(); ckRefreshStrip(); toast('오늘 하루를 기록했어요');
+    ckToday={mood:d.mood,score:score,tag:d.tag||null,memo:memo}; closeSheet(); ckRefreshStrip(); toast('오늘 하루를 기록했어요');
   };
 }
